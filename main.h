@@ -2,10 +2,6 @@
 #define _MAIN_H_
 #include "pthread.h"
 #include <stdint.h>
-<<<<<<< HEAD
-//#include "include.h"
-=======
->>>>>>> 9d278480bebe01da462685e726eb1819dfe92747
 #define BUFFSIZE 81920
  int cd;//socket 描述符
  int down_cd;
