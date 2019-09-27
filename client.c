@@ -16,7 +16,7 @@ int client_init(void)
 	//inet_aton("192.168.77.131",&ser_addr.sin_addr);//将点分式ip地址 转换为2进制 
 	
 	struct hostent *tmp;
-	tmp = gethostbyname("test.zgjuzi.com");
+	tmp = gethostbyname("smart.zgjuzi.com");
 	
 	if(tmp == NULL)
 		return -1;

@@ -4593,6 +4593,8 @@ void get_signal(void)
 	typedef struct signal_mac
 	{
 		cJSON *mac;
+		cJSON *dev_id;
+		cJSON *dev_type;
 		struct signal_mac *next;
 	}SIG;
 	SIG *sig_head,*sig_z,*sig_d,*p;
@@ -4611,6 +4613,7 @@ void get_signal(void)
 			cJSON *data_arr_jx = NULL;
 			cJSON *tem_mac = NULL;
 			cJSON *tem_type = NULL;
+			cJSON *tem_id = NULL;
 			int i,flag_get;
 			for(i=0;i<data_l;i++)
 			{
@@ -4618,6 +4621,7 @@ void get_signal(void)
 				data_arr_jx = cJSON_GetArrayItem(my_dev_list_list,i);
 				tem_mac = cJSON_GetObjectItem(data_arr_jx,"mac");
 				tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
+				tem_id = cJSON_GetObjectItem(data_arr_jx,"dev_id");
 				if(strcmp(tem_type->valuestring,"010101")==0)
 					flag_get=1;
 				else if(strcmp(tem_type->valuestring,"010102")==0)
@@ -4658,6 +4662,8 @@ void get_signal(void)
 					{
 						sig_d = (SIG *)malloc(sizeof(SIG));
 						sig_d->mac = tem_mac;
+						sig_d->dev_id = tem_id;
+						sig_d->dev_type = tem_type;
 						sig_head = sig_z = sig_d;
 						sig_d->next = NULL;
 					}
@@ -4673,6 +4679,8 @@ void get_signal(void)
 							{
 								sig_d = (SIG *)malloc(sizeof(SIG));
 								sig_d->mac = tem_mac;
+								sig_d->dev_id = tem_id;
+								sig_d->dev_type = tem_type;
 								sig_z->next = sig_d;
 								sig_d->next = NULL;
 								sig_z = sig_d;
@@ -4686,6 +4694,7 @@ void get_signal(void)
 			{
 				memset(final_cmd,0,16);
 				cmd_mix_get_signal(p->mac->valuestring,"00",final_cmd);
+				resend_zt(16,final_cmd,p->dev_id->valuestring,p->dev_type->valuestring);
 				usart_send(fd,final_cmd,16);
 				usleep(200000);
 				p = p->next;

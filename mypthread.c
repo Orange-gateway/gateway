@@ -336,8 +336,8 @@ void pthread_usart_receive(void)
 
 								for(i=0;i<data_len;i++)
 									my_u_data[i]=rc_buff[i];
-
-/*								printf("usart receive is:");
+/*
+								printf("usart receive is:");
 								for(i=0;i<data_len;i++)
 								{
 									my_u_data[i]=rc_buff[i];
@@ -548,7 +548,7 @@ void re_send(void)
 					if(p->now_times>=6)//更新发送的发送次数，表明失败放弃。
 					{
 						p->now_times=0;
-						if( NET_FLAG )
+						if( NET_FLAG && p->cmd[10] != 0x60 )
 						{
 							pthread_mutex_lock(&mutex_zl);
 							cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
