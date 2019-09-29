@@ -46,12 +46,6 @@
  	struct human *next;
  }HB;
  HB *human_head,*human_z,*human_d;
- typedef struct delay
- {
- 	int delay_time;
- 	int flag;
- }DELAY;
- DELAY *delay_head,delay_z,delay_d;
  char str_from_server[819200];//中间转换缓冲区
  char scene_list[BUFFSIZE];//情景列表缓存区
  char scene_detail[819200];//情景明细缓存区
@@ -66,12 +60,9 @@
  char gw_sn[100];//sn缓存区
  int identify_flag;//身份验证成功标志
  int go_net_flag;//允许入网标志
-
  int onekey_or_study_flag;
  char qj_model[5];
  char gw_version[9];
- 
  char zigbee_channel[3];
  char zigbee_id[5];
- 
 #endif

@@ -246,23 +246,23 @@ void file_init_common()
 	pthread_mutex_unlock(&mutex_room);
 	
 	/*初始化延时控制列表*/
-/*	memset(control_delay,0,10240);*/
-/*	int delay_fd = open("/root/delay_list.txt",O_RDWR|O_CREAT,0777);*/
-/*	int delay_fd_len = read(delay_fd,control_delay,10240);*/
-/*	close(delay_fd);*/
-/*	if(json_checker(control_delay)==0 && delay_fd_len > 0)*/
-/*	{*/
-/*		;*/
-/*	}*/
-/*	else*/
-/*	{*/
-/*		printf("delay_list not json\n");*/
-/*		delay_fd = open("/root/delay_list.txt",O_RDWR|O_CREAT|O_TRUNC,0777);*/
-/*		memset(control_delay,0,1024);*/
-/*		memcpy(control_delay,"{}",2);*/
-/*		fsync(delay_fd);*/
-/*		close(delay_fd);*/
-/*	}*/
+	memset(control_delay,0,10240);
+	int delay_fd = open("/root/delay_list.txt",O_RDWR|O_CREAT,0777);
+	int delay_fd_len = read(delay_fd,control_delay,10240);
+	close(delay_fd);
+	if(json_checker(control_delay)==0 && delay_fd_len > 0)
+	{
+		;
+	}
+	else
+	{
+		printf("delay_list not json\n");
+		delay_fd = open("/root/delay_list.txt",O_RDWR|O_CREAT|O_TRUNC,0777);
+		memset(control_delay,0,1024);
+		memcpy(control_delay,"{}",2);
+		fsync(delay_fd);
+		close(delay_fd);
+	}
 }
 
 void file_init_net(void)

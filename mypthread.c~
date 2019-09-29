@@ -1015,6 +1015,7 @@ void my_timer(void)
 			time(&mytime);
 			p = localtime(&mytime);
 			p->tm_mon+=1;
+			if(!p->tm_wday) p->tm_wday += 7;
 			if(p->tm_sec ==0 || p->tm_sec ==1 || p->tm_sec ==2 || first_num)
 			{
 				first_num = 0;
@@ -1120,7 +1121,7 @@ void my_timer(void)
 							}
 							if(flag_go == 0) continue;
 						}
-						else if(atoi(my_week) == p->tm_wday) flag_go = 1;
+						else if(atoi(my_week) == p->tm_wday ) flag_go = 1;
 						else continue;
 						if(flag_go==1)
 						{
