@@ -5,7 +5,7 @@
 
 void cmd_mix(char *mac,char *port,char *cmd,uint8_t *final_cmd);
 void cmd_mix_47(char *mac,char *port,char *cmd,uint8_t *final_cmd);
-void cmd_mix_lock(char *mac,char *port,uint8_t *final_cmd);//发送至串口合成命令(开锁控制指令)
+void cmd_mix_lock(char *mac,char *port,char *cmd,uint8_t *final_cmd);//发送至串口合成命令(开锁控制指令)
 void cmd_mix_scene(char *mac,char *port,char *cmd,uint8_t *final_cmd);
 
 void cmd_mix_get_stastus1(char *mac,char *port,char *cmd,uint8_t *final_cmd);

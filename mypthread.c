@@ -333,11 +333,11 @@ void pthread_usart_receive(void)
 								uint8_t *my_u_data = NULL;
 								my_u_data =(uint8_t*)malloc(data_len);//解析数据接收缓冲区
 								memset(my_u_data,0,data_len);
-
+/*
 								for(i=0;i<data_len;i++)
 									my_u_data[i]=rc_buff[i];
+*/
 
-/*
 								printf("usart receive is:");
 								for(i=0;i<data_len;i++)
 								{
@@ -345,7 +345,7 @@ void pthread_usart_receive(void)
 									printf("%.2x  ",my_u_data[i]);
 								}
 								printf("\n");
-*/
+
 								up_resend(my_u_data);//更新重发列表
 								
 								pth_creat_my(pthread_v_send,my_u_data);
@@ -434,6 +434,7 @@ void pthread_client_receive(void)
 					
 					if(json_checker(r_str)==0)
 					{
+						printf("recv from server : %s\n",r_str);
 						first = time(NULL);
 						pth_creat_my(pthread_u_send,r_str);
 					}
@@ -481,6 +482,7 @@ void heart_jump(void)
 			first = time(NULL);
 		}
 		time_diff = abs((unsigned int)difftime(second,first));
+		printf("time_diff : %d\n",time_diff);
 		if(time_diff > 30)
 		{
 			if(identify_flag==1) 
@@ -633,6 +635,11 @@ void re_send(void)
 						int cmd_len = p->cmd[13]+p->cmd[14]+15;
 						gettimeofday(&time_val,NULL);
 						p->now_time = time_val.tv_sec*1000+time_val.tv_usec/1000;
+						printf("resend again (%d):",p->now_times);
+						int k;
+						for(k=0;k<cmd_len;k++)
+							printf("%.2x ",p->cmd[k]);
+						printf("\n");
 						usart_send(fd, p->cmd,cmd_len);
 						usleep(200000);
 					}
@@ -1238,6 +1245,8 @@ void get_status(void)
 }
 void gateway_send_heart_jump(void)
 {
+	struct tm* p;
+	time_t mytime;
 	while(1)
 	{
 		cJSON *heart_root = cJSON_CreateObject();
@@ -1248,8 +1257,10 @@ void gateway_send_heart_jump(void)
 		memset(my_send_char,0,my_len+2);
 		memcpy(my_send_char,send_char,my_len);
 		strcat(my_send_char,"\n\0");
+		time(&mytime);
+		p = localtime(&mytime);
 		if(NET_FLAG)
-			send(cd,my_send_char,my_len+1,0);
+		printf("heart : %d %d-%d-%d\n",send(cd,my_send_char,my_len+1,0),p->tm_hour,p->tm_min,p->tm_sec);
 		free(send_char);
 		send_char=NULL;
 		free(my_send_char);
