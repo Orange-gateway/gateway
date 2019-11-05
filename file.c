@@ -245,24 +245,43 @@ void file_init_common()
 	}
 	pthread_mutex_unlock(&mutex_room);
 	
-	/*初始化延时控制列表*/
-/*	memset(control_delay,0,10240);*/
-/*	int delay_fd = open("/root/delay_list.txt",O_RDWR|O_CREAT,0777);*/
-/*	int delay_fd_len = read(delay_fd,control_delay,10240);*/
-/*	close(delay_fd);*/
-/*	if(json_checker(control_delay)==0 && delay_fd_len > 0)*/
-/*	{*/
-/*		;*/
-/*	}*/
-/*	else*/
-/*	{*/
-/*		printf("delay_list not json\n");*/
-/*		delay_fd = open("/root/delay_list.txt",O_RDWR|O_CREAT|O_TRUNC,0777);*/
-/*		memset(control_delay,0,1024);*/
-/*		memcpy(control_delay,"{}",2);*/
-/*		fsync(delay_fd);*/
-/*		close(delay_fd);*/
-/*	}*/
+	/*初始化人体列表*/
+	char control_human[10240];
+	memset(control_human,0,10240);
+	int human_fd = open("/root/human_list.txt",O_RDWR|O_CREAT,0777);
+	int human_fd_len = read(human_fd,control_human,10240);
+	close(human_fd);
+	if(json_checker(control_human)==0 && human_fd_len > 0)
+	{
+		cJSON *human_root = cJSON_Parse(control_human);
+		if(human_root != NULL)
+		{
+			if(human_root->child != NULL)
+			{
+				cJSON *human_arr = cJSON_GetObjectItem(human_root,"human_list");
+				int num = cJSON_GetArraySize(human_arr);
+				int i = 0;
+				cJSON *get_arr = NULL;
+				cJSON *tem_mac = NULL;
+				cJSON *tem_port = NULL;
+				cJSON *tem_id = NULL;
+				cJSON *tem_type = NULL;
+				cJSON *tem_time = NULL;
+				for(i=0;i<num;i++)
+				{
+					get_arr = cJSON_GetArrayItem(human_arr,i);
+					tem_mac = cJSON_GetObjectItem(get_arr,"dev_mac");
+					tem_port = cJSON_GetObjectItem(get_arr,"dev_port");
+					tem_id = cJSON_GetObjectItem(get_arr,"dev_id");
+					tem_type = cJSON_GetObjectItem(get_arr,"dev_type");
+					tem_time = cJSON_GetObjectItem(get_arr,"dev_time");
+					human_zt(tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,tem_time->valueint);
+				}
+			}
+		}
+		cJSON_Delete(human_root);
+		human_root = NULL;
+	}
 }
 
 void file_init_net(void)

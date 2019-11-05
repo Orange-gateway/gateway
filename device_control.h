@@ -58,6 +58,7 @@ void run_the_scene(char *str_id);
 void run_scene(char *sce_id);
 void run_scene_u_triger(char *dev_id,char *status);
 void run_scene_u_triger_sensor(char *dev_id,char *status);
+void run_scene_u_lock(char *dev_id,char *status);
 void power_65(uint8_t *u_data,int i,int u_data_len,char *u_data_str);
 int scene_time_judge(char *my_time,cJSON *mxid,char *strid);
 void get_signal(void);

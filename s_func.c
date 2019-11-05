@@ -644,6 +644,8 @@ void pthread_mutex_init_func(void)
 	pthread_mutex_init(&mutex_down_file,NULL);
 	pthread_mutex_init(&mutex_waite,NULL);
 	pthread_mutex_init(&mutex_room,NULL);
+	pthread_mutex_init(&mutex_human,NULL);
+	pthread_mutex_init(&mutex_resend,NULL);
 }
 
 /*********************************************************************************************/
@@ -822,4 +824,52 @@ int traversing_room_list(char *voice_str,char *ret_str)
 	cJSON_Delete(room_list_pase);
 	room_list_pase = NULL;
 	return ret;
+}
+void my_human_file(void)
+{
+	HB *p_human = NULL;
+	p_human = human_head;
+	cJSON *human_root = cJSON_CreateObject();
+	cJSON *human_arr = cJSON_CreateArray();
+	cJSON_AddItemToObject(human_root,"human_list",human_arr);
+	while( p_human )
+	{
+		if( p_human->flag )
+		{
+			cJSON *human_add = cJSON_CreateObject();
+			cJSON_AddStringToObject(human_add,"dev_mac",p_human->mac);
+			cJSON_AddStringToObject(human_add,"dev_port",p_human->port);
+			cJSON_AddStringToObject(human_add,"dev_id",p_human->id);
+			cJSON_AddStringToObject(human_add,"dev_type",p_human->type);
+			cJSON_AddNumberToObject(human_add,"dev_time",p_human->now_time);
+			cJSON_AddItemToArray(human_arr,human_add);
+		}
+		p_human = p_human->next;
+	}
+	char *my_char = cJSON_PrintUnformatted(human_root);
+	int human_file_fd = open("/root/human_list.txt",O_RDWR|O_CREAT|O_TRUNC,0777);
+	write(human_file_fd,my_char,strlen(my_char));
+	fsync(human_file_fd);
+	close(human_file_fd);
+	free(my_char);
+	my_char = NULL;
+	cJSON_Delete(human_root);
+	human_root = NULL;
+}
+void delete_delay_or_human_file(char *delete_mac)
+{
+	HB *p1 = NULL;
+	p1 = human_head;
+	pthread_mutex_lock(&mutex_human);
+	while( p1 )
+	{
+		if(!strcmp(p1->mac,delete_mac))
+		{
+			p1->flag = 0;
+			break;
+		}
+		p1 = p1->next;
+	}
+	my_human_file();
+	pthread_mutex_unlock(&mutex_human);
 }

@@ -21,7 +21,7 @@ void resend_zt(int len,uint8_t *cmd,char *dev_id,char *dev_type);
 void my_timer(void);
 void up_resend(uint8_t *data);
 void get_status(void);
-void human_zt(char *mac,char *port);
+void human_zt(char *mac,char *port,char *id,char *type,time_t num);
 void human_check(void);
 void gateway_send_heart_jump(void);
 void gateway_on_off(void);

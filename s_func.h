@@ -35,4 +35,6 @@ void get_sn_feedback(cJSON *root);
 int trigger_source_time_judge(char *time_judge);
 void read_channel(void);
 int traversing_room_list(char *voice_str,char *ret_str);
+void my_human_file(void);
+void delete_delay_or_human_file(char *delete_mac);
 #endif

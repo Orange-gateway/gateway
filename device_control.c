@@ -6203,6 +6203,7 @@ void dev_lock_con(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 				{
 					tem_id = cJSON_GetObjectItem(data_arr_jx,"dev_id");
 					tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
+					run_scene_u_lock(tem_id->valuestring,data_str);
 					if(NET_FLAG)
 					{
 						cJSON *root_u = cJSON_CreateObject();//创建项目
@@ -7416,7 +7417,10 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 					}
 					else if(strcmp(tem_type->valuestring,"060102")==0)	//human body
 					{
-						human_zt(mac_str,port_str);
+						human_zt(mac_str,port_str,tem_id->valuestring,tem_type->valuestring,0);
+						pthread_mutex_lock(&mutex_human);
+						my_human_file();
+						pthread_mutex_unlock(&mutex_human);
 						run_scene_u_triger(tem_id->valuestring,data_str);
 					}
 					else if(strcmp(tem_type->valuestring,"060203")==0)	//temperature sensor
@@ -7847,6 +7851,7 @@ void up_dev_describe(cJSON *root)//删除列表更新而更新状态列表
 		usart_send(fd,dev_net_delete,16);
 		free(dev_net_delete);
 		dev_net_delete=NULL;
+		delete_delay_or_human_file(delete_mac->valuestring);
 		cJSON *dev_list_data = NULL;
 		pthread_mutex_lock(&mutex_sl);
 		dev_list_data = cJSON_Parse(device_list);
@@ -9398,7 +9403,148 @@ void run_scene_u_triger_sensor(char *dev_id,char *status)
 	cJSON_Delete(scene_list_root);
 	scene_list_root=NULL;
 }
-
+void run_scene_u_lock(char *dev_id,char *status)
+{
+	int scene_triger_flag = 0;
+	pthread_mutex_lock(&mutex_scene);
+	cJSON *scene_list_root = cJSON_Parse(scene_list);//遍历情景列表
+	pthread_mutex_unlock(&mutex_scene);
+	if(scene_list_root != NULL)
+	{
+		if(scene_list_root->child !=NULL)
+		{
+			cJSON *scene_list_data = cJSON_GetObjectItem(scene_list_root,"data");
+			if(scene_list_data->child != NULL)
+			{
+				cJSON *scene_list_list = cJSON_GetObjectItem(scene_list_data,"scen_list");
+				int scene_num = cJSON_GetArraySize(scene_list_list);
+				int i;
+				int condition_num;
+				int j;
+				cJSON *dev_id_condition = NULL;
+				cJSON *dev_list_condition = NULL;
+				cJSON *scene_for = NULL;
+				cJSON *condtion_for = NULL;
+				for(i=0;i<scene_num;i++)
+				{
+					scene_for = cJSON_GetArrayItem(scene_list_list,i);
+					dev_list_condition = cJSON_GetObjectItem(scene_for,"trigger_dev_list");
+					condition_num = cJSON_GetArraySize(dev_list_condition);
+					for(j=0;j<condition_num;j++)
+					{
+						condtion_for = cJSON_GetArrayItem(dev_list_condition,j);
+						dev_id_condition = cJSON_GetObjectItem(condtion_for,"dev_id");
+						if(strcmp(dev_id_condition->valuestring,dev_id)==0)//找到触发设备id
+						{
+							cJSON *scene_enable_is_or = cJSON_GetObjectItem(scene_for,"is_enable");
+							if(strcmp(scene_enable_is_or->valuestring,"1")==0)
+							{
+								cJSON *dev_status_root = cJSON_GetObjectItem(condtion_for,"dev_state");
+								cJSON *dev_status = cJSON_GetObjectItem(dev_status_root,"dev_state");
+								if(!strncmp(status+2,dev_status->valuestring,2) && !strncmp(status+6,dev_status->valuestring+2,2))//change status to judge
+								{
+									if(!strncmp(dev_status->valuestring+4,status+8,2) || !strncmp(dev_status->valuestring+2,"05",2))//change status to judge
+									{
+										cJSON *allow_time = cJSON_GetObjectItem(condtion_for,"dev_time");
+										int num_allow_time = cJSON_GetArraySize(allow_time);
+										if(num_allow_time == 0)
+										{
+											cJSON *scene_id_zx = cJSON_GetObjectItem(scene_for,"scen_id");
+											char *scene_id_pthread = (char *)malloc(strlen(scene_id_zx->valuestring)+1);
+											memset(scene_id_pthread,0,strlen(scene_id_zx->valuestring)+1);
+											memcpy(scene_id_pthread,scene_id_zx->valuestring,strlen(scene_id_zx->valuestring)+1);
+											pth_creat_my(run_the_scene,scene_id_pthread);
+											scene_triger_flag = 1;
+											if(NET_FLAG)
+											{
+												cJSON *push = cJSON_GetObjectItem(scene_for,"is_push");
+												cJSON *send_root = cJSON_CreateObject();
+												cJSON_AddStringToObject(send_root,"co","orange");
+												cJSON_AddStringToObject(send_root,"api","gw_up_msg");
+												cJSON *data_scene = cJSON_CreateObject();
+												cJSON_AddItemToObject(send_root,"data",data_scene);
+												cJSON_AddStringToObject(data_scene,"id",scene_id_zx->valuestring);
+												cJSON_AddStringToObject(data_scene,"msg_type","0203");
+												if(strcmp(push->valuestring,"1")==0)
+													cJSON_AddStringToObject(data_scene,"is_push","1");
+												else
+													cJSON_AddStringToObject(data_scene,"is_push","0");
+												char *send_char = cJSON_PrintUnformatted(send_root);
+												int my_len = strlen(send_char);
+												char *my_send_char = (char *)malloc(my_len+2);
+												memset(my_send_char,0,my_len+2);
+												memcpy(my_send_char,send_char,my_len);
+												strcat(my_send_char,"\n\0");
+												send(cd,my_send_char,my_len+1,0);
+												free(send_char);
+												send_char=NULL;
+												free(my_send_char);
+												my_send_char=NULL;
+												cJSON_Delete(send_root);
+												send_root=NULL;
+											}
+										}
+										else
+										{
+											int k;
+											cJSON *time_for = NULL;
+											for(k=0;k<num_allow_time;k++)
+											{
+												time_for = cJSON_GetArrayItem(allow_time,k);
+												if(trigger_source_time_judge(time_for->valuestring)==0)
+												{
+													cJSON *scene_id_zx = cJSON_GetObjectItem(scene_for,"scen_id");
+													char *scene_id_pthread = (char *)malloc(strlen(scene_id_zx->valuestring)+1);
+													memset(scene_id_pthread,0,strlen(scene_id_zx->valuestring)+1);
+													memcpy(scene_id_pthread,scene_id_zx->valuestring,strlen(scene_id_zx->valuestring)+1);
+													pth_creat_my(run_the_scene,scene_id_pthread);
+													scene_triger_flag = 1;
+													if(NET_FLAG)
+													{
+														cJSON *push = cJSON_GetObjectItem(scene_for,"is_push");
+														cJSON *send_root = cJSON_CreateObject();
+														cJSON_AddStringToObject(send_root,"co","orange");
+														cJSON_AddStringToObject(send_root,"api","gw_up_msg");
+														cJSON *data_scene = cJSON_CreateObject();
+														cJSON_AddItemToObject(send_root,"data",data_scene);
+														cJSON_AddStringToObject(data_scene,"id",scene_id_zx->valuestring);
+														cJSON_AddStringToObject(data_scene,"msg_type","0203");
+														if(strcmp(push->valuestring,"1")==0)
+															cJSON_AddStringToObject(data_scene,"is_push","1");
+														else
+															cJSON_AddStringToObject(data_scene,"is_push","0");
+														char *send_char = cJSON_PrintUnformatted(send_root);
+														int my_len = strlen(send_char);
+														char *my_send_char = (char *)malloc(my_len+2);
+														memset(my_send_char,0,my_len+2);
+														memcpy(my_send_char,send_char,my_len);
+														strcat(my_send_char,"\n\0");
+														send(cd,my_send_char,my_len+1,0);
+														free(send_char);
+														send_char=NULL;
+														free(my_send_char);
+														my_send_char=NULL;
+														cJSON_Delete(send_root);
+														send_root=NULL;
+													}
+													break;
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						if(scene_triger_flag) break;
+					}
+					if(scene_triger_flag) break;
+				}
+			}
+		}
+	}
+	cJSON_Delete(scene_list_root);
+	scene_list_root=NULL;
+}
 int scene_time_judge(char *my_time,cJSON *mxid,char *strid)
 {
 	int flag_kt=0;
