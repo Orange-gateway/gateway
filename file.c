@@ -282,6 +282,50 @@ void file_init_common()
 		cJSON_Delete(human_root);
 		human_root = NULL;
 	}
+	
+	/*初始化延时控制列表*/
+	char control_delay[10240];
+	memset(control_delay,0,10240);
+	int delay_fd = open("/root/delay_list.txt",O_RDWR|O_CREAT,0777);
+	int delay_fd_len = read(delay_fd,control_delay,10240);
+	close(delay_fd);
+	if(json_checker(control_delay)==0 && delay_fd_len > 0)
+	{
+		cJSON *delay_root = cJSON_Parse(control_delay);
+		if(delay_root != NULL)
+		{
+			if(delay_root->child != NULL)
+			{
+				cJSON *delay_arr = cJSON_GetObjectItem(delay_root,"delay_list");
+				int num = cJSON_GetArraySize(delay_arr);
+				int i = 0;
+				cJSON *get_arr = NULL;
+				cJSON *tem_id = NULL;
+				cJSON *tem_mac = NULL;
+				cJSON *tem_type = NULL;
+				cJSON *tem_port = NULL;
+				cJSON *tem_hour = NULL;
+				cJSON *tem_min = NULL;
+				cJSON *tem_sec = NULL;
+				cJSON *tem_cmd = NULL;
+				for(i=0;i<num;i++)
+				{
+					get_arr = cJSON_GetArrayItem(delay_arr,i);
+					tem_id = cJSON_GetObjectItem(get_arr,"dev_id");
+					tem_mac = cJSON_GetObjectItem(get_arr,"dev_mac");
+					tem_type = cJSON_GetObjectItem(get_arr,"dev_type");
+					tem_port = cJSON_GetObjectItem(get_arr,"dev_port");
+					tem_hour = cJSON_GetObjectItem(get_arr,"dev_hour");
+					tem_min = cJSON_GetObjectItem(get_arr,"dev_min");
+					tem_sec = cJSON_GetObjectItem(get_arr,"dev_sec");
+					tem_cmd = cJSON_GetObjectItem(get_arr,"dev_cmd");
+					delay_zt(tem_cmd->valuestring,tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,tem_hour->valueint,tem_min->valueint,tem_sec->valueint,0);
+				}
+			}
+		}
+		cJSON_Delete(delay_root);
+		delay_root = NULL;
+	}
 }
 
 void file_init_net(void)

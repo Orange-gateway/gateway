@@ -193,6 +193,35 @@ void cmd_mix_lock(char *mac,char *port,char *cmd,uint8_t *final_cmd)//发送至�
 	str_to_hex(final_cmd,send_cmd,25);
 }
 /***********************************************************************************************************/
+void dev_set_time(cJSON *root,char *str)
+{
+	int my_len = strlen(str);
+	char *my_send_char = (char *)malloc(my_len+2);
+	memset(my_send_char,0,my_len+2);
+	memcpy(my_send_char,str,my_len);
+	strcat(my_send_char,"\n\0");
+	send(cd,my_send_char,my_len+1,0);
+	cJSON *delay_data = cJSON_GetObjectItem(root,"data");
+	cJSON *delay_dev_id = cJSON_GetObjectItem(delay_data,"dev_id");
+	cJSON *delay_dev_mac = cJSON_GetObjectItem(delay_data,"dev_mac");
+	cJSON *delay_dev_type = cJSON_GetObjectItem(delay_data,"dev_type");
+	cJSON *delay_dev_port = cJSON_GetObjectItem(delay_data,"dev_port");
+	cJSON *delay_dev_cmd = cJSON_GetObjectItem(delay_data,"dev_cmd");
+	cJSON *delay_dev_time = cJSON_GetObjectItem(delay_data,"dev_time");
+	int time_hour = atoi(delay_dev_time->valuestring);
+	int time_min = atoi(delay_dev_time->valuestring+3);
+	int time_sec = atoi(delay_dev_time->valuestring+6);
+	cJSON *delay_type = cJSON_GetObjectItem(delay_data,"type");
+	if(!strcmp(delay_type->valuestring,"set"))
+		delay_zt(delay_dev_cmd->valuestring,delay_dev_mac->valuestring,delay_dev_port->valuestring,delay_dev_id->valuestring,delay_dev_type->valuestring,time_hour,time_min,time_sec,0);
+	else if(!strcmp(delay_type->valuestring,"del"))
+		delay_zt(delay_dev_cmd->valuestring,delay_dev_mac->valuestring,delay_dev_port->valuestring,delay_dev_id->valuestring,delay_dev_type->valuestring,time_hour,time_min,time_sec,1);
+	pthread_mutex_lock(&mutex_delay);
+	my_delay_file();
+	pthread_mutex_unlock(&mutex_delay);
+	free(my_send_char);
+	my_send_char = NULL;
+}
 void dev_com_con(cJSON *root)//无内存泄露问题
 {
 	int kg;
@@ -281,6 +310,16 @@ void dev_com_con(cJSON *root)//无内存泄露问题
 							flag_kg=1;
 					}
 					else if(strcmp(dev_type_this->valuestring,"010104")==0)
+					{
+						cmd_mix(data_mac->valuestring,data_port->valuestring,data_dev_cmd->valuestring,final_cmd);
+						resend_zt(15+len_of_cmd,final_cmd,dev_id_this->valuestring,dev_type_this->valuestring);
+						usart_send(fd, final_cmd,15+len_of_cmd);
+						if(strcmp(data_dev_cmd->valuestring,"00")==0)
+							flag_kg=0;
+						else
+							flag_kg=1;
+					}
+					else if(strcmp(dev_type_this->valuestring,"010105")==0)
 					{
 						cmd_mix(data_mac->valuestring,data_port->valuestring,data_dev_cmd->valuestring,final_cmd);
 						resend_zt(15+len_of_cmd,final_cmd,dev_id_this->valuestring,dev_type_this->valuestring);
@@ -440,6 +479,8 @@ void dev_com_con(cJSON *root)//无内存泄露问题
 																else if(strcmp(data_type_for->valuestring,"010103")==0)
 																	kg=1;
 																else if(strcmp(data_type_for->valuestring,"010104")==0)
+																	kg=1;
+																else if(strcmp(data_type_for->valuestring,"010105")==0)
 																	kg=1;
 																else if(strcmp(data_type_for->valuestring,"010501")==0)
 																	kg=1;
@@ -644,6 +685,8 @@ void dev_room_con(cJSON *root)//无内存泄露问题
 						else if(strcmp(data_type->valuestring,"010103")==0)
 							kg=1;
 						else if(strcmp(data_type->valuestring,"010104")==0)
+							kg=1;
+						else if(strcmp(data_type->valuestring,"010105")==0)
 							kg=1;
 						else if(strcmp(data_type->valuestring,"040101")==0)
 							kg=1;
@@ -888,6 +931,8 @@ void voice_open(cJSON *data_arr_jx,char *Voice_CMD)
 	else if(!strcmp(tem_type->valuestring,"010103"))//一字节命令为1
 	class=1;
 	else if(!strcmp(tem_type->valuestring,"010104"))//一字节命令为1
+	class=1;
+	else if(!strcmp(tem_type->valuestring,"010105"))//一字节命令为1
 	class=1;
 	else if(!strcmp(tem_type->valuestring,"010201"))//一字节命令为1
 	class=1;
@@ -1472,6 +1517,8 @@ void voice_close(cJSON *data_arr_jx)
 	else if(!strcmp(tem_type->valuestring,"010103"))//一字节命令为1
 	class=1;
 	else if(!strcmp(tem_type->valuestring,"010104"))//一字节命令为1
+	class=1;
+	else if(!strcmp(tem_type->valuestring,"010105"))//一字节命令为1
 	class=1;
 	else if(!strcmp(tem_type->valuestring,"010201"))//一字节命令为1
 	class=1;
@@ -2831,7 +2878,314 @@ void voice_con(cJSON *root)
 		char voice_str_in[50];
 		memset(voice_str_in,0,50);
 		int traver_ret = traversing_room_list(voice_cmd->valuestring,voice_str_in);
-		if(strstr(voice_cmd->valuestring,"打开")||strstr(voice_cmd->valuestring,"开启")||strstr(voice_cmd->valuestring,"启动"))
+		if(strstr(voice_cmd->valuestring,"时") || strstr(voice_cmd->valuestring,"分") || strstr(voice_cmd->valuestring,"秒"))
+		{
+			int flag_voice = 1;
+			pthread_mutex_lock(&mutex_sl);
+			cJSON *dev_list_data = cJSON_Parse(device_list);//遍历设备列表
+			pthread_mutex_unlock(&mutex_sl);
+			if(dev_list_data != NULL)
+			{
+				if(dev_list_data->child != NULL)
+				{
+					cJSON *my_dev_list_data = cJSON_GetObjectItem(dev_list_data,"data");
+					cJSON *my_dev_list_list = cJSON_GetObjectItem(my_dev_list_data,"dev_list");
+					int	data_l =  cJSON_GetArraySize(my_dev_list_list);
+					cJSON *data_arr_jx = NULL;
+					cJSON *tem_name = NULL;
+					cJSON *tem_room_id = NULL;
+					cJSON *tem_type = NULL;
+					int i,j;
+					for(i=0;i<data_l;i++)
+					{
+						data_arr_jx = cJSON_GetArrayItem(my_dev_list_list,i);
+						tem_name = cJSON_GetObjectItem(data_arr_jx,"dev_name");
+						tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
+						tem_room_id = cJSON_GetObjectItem(data_arr_jx,"room_id");
+						if(traver_ret)
+						{
+							if(strstr(voice_cmd->valuestring,tem_name->valuestring) && !strcmp(tem_room_id->valuestring,voice_str_in) && !strcmp(tem_type->valuestring,"010105"))
+							{
+								flag_voice=0;
+								run_if=3;
+								int my_delay_time[3] = {255,255,255};
+								if(strstr(voice_cmd->valuestring,"时"))
+									my_delay_time[0] = judge_hour_delay(voice_cmd->valuestring);
+								if(strstr(voice_cmd->valuestring,"分"))
+									my_delay_time[1] = judge_min_delay(voice_cmd->valuestring);
+								if(strstr(voice_cmd->valuestring,"秒"))
+									my_delay_time[2] = judge_sec_delay(voice_cmd->valuestring);
+								if(my_delay_time[0] != 255 || my_delay_time[1] != 255 || my_delay_time[2] != 255)
+								{
+									time_t time_open_close;
+									time(&time_open_close);
+									struct tm* p_delay;
+									p_delay = localtime(&time_open_close);
+									if(my_delay_time[2] != 255)
+									{
+										p_delay->tm_sec += my_delay_time[2];
+										p_delay->tm_min = p_delay->tm_min + p_delay->tm_sec/60;
+										p_delay->tm_sec = p_delay->tm_sec%60;
+										p_delay->tm_hour = p_delay->tm_hour + p_delay->tm_min/60;
+										p_delay->tm_min = p_delay->tm_min%60;
+										p_delay->tm_hour = p_delay->tm_hour%24;
+									}
+									if(my_delay_time[1] != 255)
+									{
+										p_delay->tm_min += my_delay_time[1];
+										p_delay->tm_hour = p_delay->tm_hour + p_delay->tm_min/60;
+										p_delay->tm_min = p_delay->tm_min%60;
+										p_delay->tm_hour = p_delay->tm_hour%24;
+									}
+									if(my_delay_time[0] != 255)
+									{
+										p_delay->tm_hour += my_delay_time[0];
+										p_delay->tm_hour = p_delay->tm_hour%24;
+									}
+									if(strstr(voice_cmd->valuestring,"打开") || strstr(voice_cmd->valuestring,"关闭") || strstr(voice_cmd->valuestring,"取消") || strstr(voice_cmd->valuestring,"删除") || strstr(voice_cmd->valuestring,"清除"))
+									{
+										cJSON *tem_mac = cJSON_GetObjectItem(data_arr_jx,"mac");
+										cJSON *tem_port = cJSON_GetObjectItem(data_arr_jx,"dev_port");
+										cJSON *tem_id = cJSON_GetObjectItem(data_arr_jx,"dev_id");
+										cJSON *tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
+										if(strstr(voice_cmd->valuestring,"打开"))
+											delay_zt("01",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,0);
+										else if(strstr(voice_cmd->valuestring,"关闭"))
+											delay_zt("00",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,0);
+										else
+											delay_zt("00",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,1);
+										pthread_mutex_lock(&mutex_delay);
+										my_delay_file();
+										pthread_mutex_unlock(&mutex_delay);
+									}
+								}
+							}
+							else if(i==(data_l-1) && flag_voice == 1 )
+							{
+								for(j=0;j<data_l;j++)
+								{
+									data_arr_jx = cJSON_GetArrayItem(my_dev_list_list,j);
+									tem_name = cJSON_GetObjectItem(data_arr_jx,"dev_name");
+									tem_room_id = cJSON_GetObjectItem(data_arr_jx,"room_id");
+									char *my_str_first = NULL;
+									char *my_str_second = NULL;
+									char *voice_str_first = NULL;
+									char *voice_str_second = NULL;
+									my_str_first = tiqu(tem_name->valuestring);
+									voice_str_first = tiqu(voice_cmd->valuestring);
+									my_str_second = str_judge(my_str_first);
+									voice_str_second = str_judge(voice_str_first);
+									if(strstr(voice_str_second,my_str_second) && !strcmp(tem_room_id->valuestring,voice_str_in) && !strcmp(tem_type->valuestring,"010105"))
+									{
+										run_if=3;
+										int my_delay_time[3] = {255,255,255};
+										if(strstr(voice_cmd->valuestring,"时"))
+											my_delay_time[0] = judge_hour_delay(voice_cmd->valuestring);
+										if(strstr(voice_cmd->valuestring,"分"))
+											my_delay_time[1] = judge_min_delay(voice_cmd->valuestring);
+										if(strstr(voice_cmd->valuestring,"秒"))
+											my_delay_time[2] = judge_sec_delay(voice_cmd->valuestring);
+										if(my_delay_time[0] != 255 || my_delay_time[1] != 255 || my_delay_time[2] != 255)
+										{
+											time_t time_open_close;
+											time(&time_open_close);
+											struct tm* p_delay;
+											p_delay = localtime(&time_open_close);
+											if(my_delay_time[2] != 255)
+											{
+												p_delay->tm_sec += my_delay_time[2];
+												p_delay->tm_min = p_delay->tm_min + p_delay->tm_sec/60;
+												p_delay->tm_sec = p_delay->tm_sec%60;
+												p_delay->tm_hour = p_delay->tm_hour + p_delay->tm_min/60;
+												p_delay->tm_min = p_delay->tm_min%60;
+												p_delay->tm_hour = p_delay->tm_hour%24;
+											}
+											if(my_delay_time[1] != 255)
+											{
+												p_delay->tm_min += my_delay_time[1];
+												p_delay->tm_hour = p_delay->tm_hour + p_delay->tm_min/60;
+												p_delay->tm_min = p_delay->tm_min%60;
+												p_delay->tm_hour = p_delay->tm_hour%24;
+											}
+											if(my_delay_time[0] != 255)
+											{
+												p_delay->tm_hour += my_delay_time[0];
+												p_delay->tm_hour = p_delay->tm_hour%24;
+											}
+											if(strstr(voice_cmd->valuestring,"打开") || strstr(voice_cmd->valuestring,"关闭") || strstr(voice_cmd->valuestring,"取消") || strstr(voice_cmd->valuestring,"删除") || strstr(voice_cmd->valuestring,"清除"))
+											{
+												cJSON *tem_mac = cJSON_GetObjectItem(data_arr_jx,"mac");
+												cJSON *tem_port = cJSON_GetObjectItem(data_arr_jx,"dev_port");
+												cJSON *tem_id = cJSON_GetObjectItem(data_arr_jx,"dev_id");
+												cJSON *tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
+												if(strstr(voice_cmd->valuestring,"打开"))
+													delay_zt("01",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,0);
+												else if(strstr(voice_cmd->valuestring,"关闭"))
+													delay_zt("00",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,0);
+												else
+													delay_zt("00",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,1);
+												pthread_mutex_lock(&mutex_delay);
+												my_delay_file();
+												pthread_mutex_unlock(&mutex_delay);
+											}
+										}
+									}
+									free(my_str_first);
+									my_str_first=NULL;
+									free(my_str_second);
+									my_str_second=NULL;
+									free(voice_str_first);
+									voice_str_first=NULL;
+									free(voice_str_second);
+									voice_str_second=NULL;
+								}
+							}
+						}
+						else
+						{
+							if(strstr(voice_cmd->valuestring,tem_name->valuestring) && !strcmp(tem_type->valuestring,"010105"))
+							{
+								flag_voice=0;
+								run_if=3;
+								int my_delay_time[3] = {255,255,255};
+								if(strstr(voice_cmd->valuestring,"时"))
+									my_delay_time[0] = judge_hour_delay(voice_cmd->valuestring);
+								if(strstr(voice_cmd->valuestring,"分"))
+									my_delay_time[1] = judge_min_delay(voice_cmd->valuestring);
+								if(strstr(voice_cmd->valuestring,"秒"))
+									my_delay_time[2] = judge_sec_delay(voice_cmd->valuestring);
+								if(my_delay_time[0] != 255 || my_delay_time[1] != 255 || my_delay_time[2] != 255)
+								{
+									time_t time_open_close;
+									time(&time_open_close);
+									struct tm* p_delay;
+									p_delay = localtime(&time_open_close);
+									if(my_delay_time[2] != 255)
+									{
+										p_delay->tm_sec += my_delay_time[2];
+										p_delay->tm_min = p_delay->tm_min + p_delay->tm_sec/60;
+										p_delay->tm_sec = p_delay->tm_sec%60;
+										p_delay->tm_hour = p_delay->tm_hour + p_delay->tm_min/60;
+										p_delay->tm_min = p_delay->tm_min%60;
+										p_delay->tm_hour = p_delay->tm_hour%24;
+									}
+									if(my_delay_time[1] != 255)
+									{
+										p_delay->tm_min += my_delay_time[1];
+										p_delay->tm_hour = p_delay->tm_hour + p_delay->tm_min/60;
+										p_delay->tm_min = p_delay->tm_min%60;
+										p_delay->tm_hour = p_delay->tm_hour%24;
+									}
+									if(my_delay_time[0] != 255)
+									{
+										p_delay->tm_hour += my_delay_time[0];
+										p_delay->tm_hour = p_delay->tm_hour%24;
+									}
+									if(strstr(voice_cmd->valuestring,"打开") || strstr(voice_cmd->valuestring,"关闭") || strstr(voice_cmd->valuestring,"取消") || strstr(voice_cmd->valuestring,"删除") || strstr(voice_cmd->valuestring,"清除"))
+									{
+										cJSON *tem_mac = cJSON_GetObjectItem(data_arr_jx,"mac");
+										cJSON *tem_port = cJSON_GetObjectItem(data_arr_jx,"dev_port");
+										cJSON *tem_id = cJSON_GetObjectItem(data_arr_jx,"dev_id");
+										cJSON *tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
+										if(strstr(voice_cmd->valuestring,"打开"))
+											delay_zt("01",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,0);
+										else if(strstr(voice_cmd->valuestring,"关闭"))
+											delay_zt("00",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,0);
+										else
+											delay_zt("00",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,1);
+										pthread_mutex_lock(&mutex_delay);
+										my_delay_file();
+										pthread_mutex_unlock(&mutex_delay);
+									}
+								}
+							}
+							else if(i==(data_l-1) && flag_voice == 1)
+							{
+								for(j=0;j<data_l;j++)
+								{
+									data_arr_jx = cJSON_GetArrayItem(my_dev_list_list,j);
+									tem_name = cJSON_GetObjectItem(data_arr_jx,"dev_name");
+									char *my_str_first = NULL;
+									char *my_str_second = NULL;
+									char *voice_str_first = NULL;
+									char *voice_str_second = NULL;
+									my_str_first = tiqu(tem_name->valuestring);
+									voice_str_first = tiqu(voice_cmd->valuestring);
+									my_str_second = str_judge(my_str_first);
+									voice_str_second = str_judge(voice_str_first);
+									if(strstr(voice_str_second,my_str_second) && !strcmp(tem_type->valuestring,"010105"))
+									{
+										run_if=3;
+										int my_delay_time[3] = {255,255,255};
+										if(strstr(voice_cmd->valuestring,"时"))
+											my_delay_time[0] = judge_hour_delay(voice_cmd->valuestring);
+										if(strstr(voice_cmd->valuestring,"分"))
+											my_delay_time[1] = judge_min_delay(voice_cmd->valuestring);
+										if(strstr(voice_cmd->valuestring,"秒"))
+											my_delay_time[2] = judge_sec_delay(voice_cmd->valuestring);
+										if(my_delay_time[0] != 255 || my_delay_time[1] != 255 || my_delay_time[2] != 255)
+										{
+											time_t time_open_close;
+											time(&time_open_close);
+											struct tm* p_delay;
+											p_delay = localtime(&time_open_close);
+											if(my_delay_time[2] != 255)
+											{
+												p_delay->tm_sec += my_delay_time[2];
+												p_delay->tm_min = p_delay->tm_min + p_delay->tm_sec/60;
+												p_delay->tm_sec = p_delay->tm_sec%60;
+												p_delay->tm_hour = p_delay->tm_hour + p_delay->tm_min/60;
+												p_delay->tm_min = p_delay->tm_min%60;
+												p_delay->tm_hour = p_delay->tm_hour%24;
+											}
+											if(my_delay_time[1] != 255)
+											{
+												p_delay->tm_min += my_delay_time[1];
+												p_delay->tm_hour = p_delay->tm_hour + p_delay->tm_min/60;
+												p_delay->tm_min = p_delay->tm_min%60;
+												p_delay->tm_hour = p_delay->tm_hour%24;
+											}
+											if(my_delay_time[0] != 255)
+											{
+												p_delay->tm_hour += my_delay_time[0];
+												p_delay->tm_hour = p_delay->tm_hour%24;
+											}
+											if(strstr(voice_cmd->valuestring,"打开") || strstr(voice_cmd->valuestring,"关闭") || strstr(voice_cmd->valuestring,"取消") || strstr(voice_cmd->valuestring,"删除") || strstr(voice_cmd->valuestring,"清除"))
+											{
+												cJSON *tem_mac = cJSON_GetObjectItem(data_arr_jx,"mac");
+												cJSON *tem_port = cJSON_GetObjectItem(data_arr_jx,"dev_port");
+												cJSON *tem_id = cJSON_GetObjectItem(data_arr_jx,"dev_id");
+												cJSON *tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
+												if(strstr(voice_cmd->valuestring,"打开"))
+													delay_zt("01",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,0);
+												else if(strstr(voice_cmd->valuestring,"关闭"))
+													delay_zt("00",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,0);
+												else
+													delay_zt("00",tem_mac->valuestring,tem_port->valuestring,tem_id->valuestring,tem_type->valuestring,p_delay->tm_hour,p_delay->tm_min,p_delay->tm_sec,1);
+												pthread_mutex_lock(&mutex_delay);
+												my_delay_file();
+												pthread_mutex_unlock(&mutex_delay);
+											}
+										}
+									}
+									free(my_str_first);
+									my_str_first=NULL;
+									free(my_str_second);
+									my_str_second=NULL;
+									free(voice_str_first);
+									voice_str_first=NULL;
+									free(voice_str_second);
+									voice_str_second=NULL;
+								}
+							}
+						}
+					}
+				}
+			}
+			cJSON_Delete(dev_list_data);
+			dev_list_data=NULL;
+		}
+		else if(strstr(voice_cmd->valuestring,"打开")||strstr(voice_cmd->valuestring,"开启")||strstr(voice_cmd->valuestring,"启动"))
 		{
 			int flag_voice = 1;
 			pthread_mutex_lock(&mutex_sl);
@@ -4630,6 +4984,8 @@ void get_signal(void)
 					flag_get=1;
 				else if(strcmp(tem_type->valuestring,"010104")==0)
 					flag_get=1;
+				else if(strcmp(tem_type->valuestring,"010105")==0)
+					flag_get=1;
 				else if(strcmp(tem_type->valuestring,"010201")==0)
 					flag_get=1;
 				else if(strcmp(tem_type->valuestring,"010301")==0)
@@ -4794,7 +5150,7 @@ void voice_com_con_u(int i,uint8_t *u_data,char *u_data_str)
  														if(!strcmp(tem_id->valuestring,my_scene_id->valuestring))
 														{
 															tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
-															if(!strcmp(tem_type->valuestring,"010101")||!strcmp(tem_type->valuestring,"010103")||!strcmp(tem_type->valuestring,"010104")||!strcmp(tem_type->valuestring,"010501"))//开关类
+															if(!strcmp(tem_type->valuestring,"010101")||!strcmp(tem_type->valuestring,"010103")||!strcmp(tem_type->valuestring,"010104")||!strcmp(tem_type->valuestring,"010105")||!strcmp(tem_type->valuestring,"010501"))//开关类
 															{
 																uint8_t final_cmd[16];
 																memset(final_cmd,0,16);
@@ -5624,6 +5980,13 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 						else
 							flag_kg=1;
 					}
+					else if(strcmp(tem_type->valuestring,"010105")==0)
+					{
+						if(strcmp(data_str,"00")==0)
+							flag_kg=0;
+						else
+							flag_kg=1;
+					}
 					else if(strcmp(tem_type->valuestring,"010201")==0)
 					{
 						if(strcmp(data_str,"00")==0)
@@ -5779,6 +6142,8 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 																	else if(strcmp(tem_type_for->valuestring,"010103")==0)
 																		kg=1;
 																	else if(strcmp(tem_type_for->valuestring,"010104")==0)
+																		kg=1;
+																	else if(strcmp(tem_type_for->valuestring,"010105")==0)
 																		kg=1;
 																	else if(strcmp(tem_type_for->valuestring,"010501")==0)
 																		kg=1;
@@ -8012,6 +8377,8 @@ void up_dev_des(void)//随着列表更新而更新状态列表
 								a=3;
 							else if(strcmp(data_type->valuestring,"010104")==0)//语音开关
 								a=3;
+							else if(strcmp(data_type->valuestring,"010105")==0)//定时插座
+								a=3;
 							else if(strcmp(data_type->valuestring,"010201")==0)//调光灯
 								a=3;
 							else if(strcmp(data_type->valuestring,"010301")==0)//RGB调色灯
@@ -8207,6 +8574,8 @@ void up_dev_des(void)//随着列表更新而更新状态列表
 									else if(strcmp(data_type->valuestring,"010103")==0)//带背光开关
 										a=3;
 									else if(strcmp(data_type->valuestring,"010104")==0)//语音开关
+										a=3;
+									else if(strcmp(data_type->valuestring,"010105")==0)//定时插座
 										a=3;
 									else if(strcmp(data_type->valuestring,"010201")==0)//调光灯
 										a=3;
@@ -8687,9 +9056,9 @@ void run_the_scene(char *str_id)
 							{	
 								return_val = 6;
 								cJSON *time_delay = cJSON_GetObjectItem(scene_for,"time_delay");
-								sleep(atoi(time_delay->valuestring));
-								if(atoi(time_delay->valuestring)==0)
-								usleep(200000);
+								if(strcmp(time_delay->valuestring,"0.5")==0) usleep(500000);
+								else if(atoi(time_delay->valuestring)==0) usleep(200000);
+								else sleep(atoi(time_delay->valuestring));
 								cJSON *allow_root = cJSON_GetObjectItem(scene_for,"allowed_time");
 								int t_n = cJSON_GetArraySize(allow_root);
 								if(t_n==0)
@@ -9645,6 +10014,8 @@ int scene_time_judge(char *my_time,cJSON *mxid,char *strid)
 							else if(!strcmp(tem_type->valuestring,"010103"))//带背光开关
 								class=4;
 							else if(!strcmp(tem_type->valuestring,"010104"))//语音开关
+								class=4;
+							else if(!strcmp(tem_type->valuestring,"010105"))//定时插座
 								class=4;
 							else if(!strcmp(tem_type->valuestring,"010201"))//调光灯
 								class=4;

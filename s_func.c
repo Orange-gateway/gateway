@@ -645,6 +645,7 @@ void pthread_mutex_init_func(void)
 	pthread_mutex_init(&mutex_waite,NULL);
 	pthread_mutex_init(&mutex_room,NULL);
 	pthread_mutex_init(&mutex_human,NULL);
+	pthread_mutex_init(&mutex_delay,NULL);
 	pthread_mutex_init(&mutex_resend,NULL);
 }
 
@@ -825,6 +826,40 @@ int traversing_room_list(char *voice_str,char *ret_str)
 	room_list_pase = NULL;
 	return ret;
 }
+void my_delay_file(void)
+{
+	DELAY *p_delay = NULL;
+	p_delay = delay_head;
+	cJSON *delay_root = cJSON_CreateObject();
+	cJSON *delay_arr = cJSON_CreateArray();
+	cJSON_AddItemToObject(delay_root,"delay_list",delay_arr);
+	while( p_delay )
+	{
+		if( p_delay->flag )
+		{
+			cJSON *delay_add = cJSON_CreateObject();
+			cJSON_AddStringToObject(delay_add,"dev_id",p_delay->dev_id);
+			cJSON_AddStringToObject(delay_add,"dev_mac",p_delay->dev_mac);
+			cJSON_AddStringToObject(delay_add,"dev_type",p_delay->dev_type);
+			cJSON_AddStringToObject(delay_add,"dev_port",p_delay->dev_port);
+			cJSON_AddStringToObject(delay_add,"dev_cmd",p_delay->cmd);
+			cJSON_AddNumberToObject(delay_add,"dev_hour",p_delay->delay_time[0]);
+			cJSON_AddNumberToObject(delay_add,"dev_min",p_delay->delay_time[1]);
+			cJSON_AddNumberToObject(delay_add,"dev_sec",p_delay->delay_time[2]);
+			cJSON_AddItemToArray(delay_arr,delay_add);
+		}
+		p_delay = p_delay->next;
+	}
+	char *my_char = cJSON_PrintUnformatted(delay_root);
+	int delay_file_fd = open("/root/delay_list.txt",O_RDWR|O_CREAT|O_TRUNC,0777);
+	write(delay_file_fd,my_char,strlen(my_char));
+	fsync(delay_file_fd);
+	close(delay_file_fd);
+	free(my_char);
+	my_char = NULL;
+	cJSON_Delete(delay_root);
+	delay_root = NULL;
+}
 void my_human_file(void)
 {
 	HB *p_human = NULL;
@@ -872,4 +907,19 @@ void delete_delay_or_human_file(char *delete_mac)
 	}
 	my_human_file();
 	pthread_mutex_unlock(&mutex_human);
+	
+	DELAY *p = NULL;
+	p = delay_head;
+	pthread_mutex_lock(&mutex_delay);
+	while( p )
+	{
+		if(!strcmp(p->dev_mac,delete_mac))
+		{
+			p->flag = 0;
+			my_delay_file();
+			break;
+		}
+		p = p->next;
+	}
+	pthread_mutex_unlock(&mutex_delay);
 }

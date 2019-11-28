@@ -7831,5 +7831,303 @@ int judge_number_kt(char *voice_str)
 	else
 		return 255;
 }
-
+int judge_hour_delay(char *voice_str)
+{
+	if(strstr(voice_str,"二十一小时") || strstr(voice_str,"二十一个小时") || strstr(voice_str,"21小时") || strstr(voice_str,"21个小时"))
+		return 21;
+	else if(strstr(voice_str,"二十二小时") || strstr(voice_str,"二十二个小时") || strstr(voice_str,"22小时") || strstr(voice_str,"22个小时"))
+		return 22;
+	else if(strstr(voice_str,"二十三小时") || strstr(voice_str,"二十三个小时") || strstr(voice_str,"23小时") || strstr(voice_str,"23个小时"))
+		return 23;
+	else if(strstr(voice_str,"十一小时") || strstr(voice_str,"十一个小时") || strstr(voice_str,"11小时") || strstr(voice_str,"11个小时"))
+		return 11;
+	else if(strstr(voice_str,"十二小时") || strstr(voice_str,"十二个小时") || strstr(voice_str,"12小时") || strstr(voice_str,"12个小时"))
+		return 12;
+	else if(strstr(voice_str,"十三小时") || strstr(voice_str,"十三个小时") || strstr(voice_str,"13小时") || strstr(voice_str,"13个小时"))
+		return 13;
+	else if(strstr(voice_str,"十四小时") || strstr(voice_str,"十四个小时") || strstr(voice_str,"14小时") || strstr(voice_str,"14个小时"))
+		return 14;
+	else if(strstr(voice_str,"十五小时") || strstr(voice_str,"十五个小时") || strstr(voice_str,"15小时") || strstr(voice_str,"15个小时"))
+		return 15;
+	else if(strstr(voice_str,"十六小时") || strstr(voice_str,"十六个小时") || strstr(voice_str,"16小时") || strstr(voice_str,"16个小时"))
+		return 16;
+	else if(strstr(voice_str,"十七小时") ||  strstr(voice_str,"十七个小时") || strstr(voice_str,"17小时") || strstr(voice_str,"17个小时"))
+		return 17;
+	else if(strstr(voice_str,"十八小时") || strstr(voice_str,"十八个小时") || strstr(voice_str,"18小时") || strstr(voice_str,"18个小时"))
+		return 18;
+	else if(strstr(voice_str,"十九小时") || strstr(voice_str,"十九个小时") || strstr(voice_str,"19小时") || strstr(voice_str,"19个小时"))
+		return 19;
+	else if(strstr(voice_str,"十小时") || strstr(voice_str,"十个小时") || strstr(voice_str,"10小时") || strstr(voice_str,"10个小时"))
+		return 10;
+	else if(strstr(voice_str,"一小时") || strstr(voice_str,"一个小时") || strstr(voice_str,"1小时") || strstr(voice_str,"1个小时"))
+		return 1;
+	else if(strstr(voice_str,"二小时") || strstr(voice_str,"2小时") || strstr(voice_str,"两小时") || strstr(voice_str,"两个小时"))
+		return 2;
+	else if(strstr(voice_str,"三小时") || strstr(voice_str,"三个小时") || strstr(voice_str,"3小时") || strstr(voice_str,"3个小时"))
+		return 3;
+	else if(strstr(voice_str,"四小时") || strstr(voice_str,"四个小时") || strstr(voice_str,"4小时") || strstr(voice_str,"4个小时"))
+		return 4;
+	else if(strstr(voice_str,"五小时") || strstr(voice_str,"五个小时") || strstr(voice_str,"5小时") || strstr(voice_str,"5个小时"))
+		return 5;
+	else if(strstr(voice_str,"六小时") || strstr(voice_str,"六个小时") || strstr(voice_str,"6小时") || strstr(voice_str,"6个小时"))
+		return 6;
+	else if(strstr(voice_str,"七小时") || strstr(voice_str,"七个小时") || strstr(voice_str,"7小时") || strstr(voice_str,"7个小时"))
+		return 7;
+	else if(strstr(voice_str,"八小时") || strstr(voice_str,"八个小时") || strstr(voice_str,"8小时") || strstr(voice_str,"8个小时"))
+		return 8;
+	else if(strstr(voice_str,"九小时") || strstr(voice_str,"九个小时") || strstr(voice_str,"9小时") || strstr(voice_str,"9个小时"))
+		return 9;
+	else
+		return 255;
+}
+int judge_min_delay(char *voice_str)
+{
+	if(strstr(voice_str,"二十一分钟") || strstr(voice_str,"21分钟"))
+		return 21;
+	else if(strstr(voice_str,"二十二分钟") || strstr(voice_str,"22分钟"))
+		return 22;
+	else if(strstr(voice_str,"二十三分钟") || strstr(voice_str,"23分钟"))
+		return 23;
+	else if(strstr(voice_str,"二十四分钟") || strstr(voice_str,"24分钟"))
+		return 24;
+	else if(strstr(voice_str,"二十五分钟") || strstr(voice_str,"25分钟"))
+		return 25;
+	else if(strstr(voice_str,"二十六分钟") || strstr(voice_str,"26分钟"))
+		return 26;
+	else if(strstr(voice_str,"二十七分钟") || strstr(voice_str,"27分钟"))
+		return 27;
+	else if(strstr(voice_str,"二十八分钟") || strstr(voice_str,"28分钟"))
+		return 28;
+	else if(strstr(voice_str,"二十九分钟") || strstr(voice_str,"29分钟"))
+		return 29;
+	else if(strstr(voice_str,"三十一分钟") || strstr(voice_str,"31分钟"))
+		return 31;
+	else if(strstr(voice_str,"三十二分钟") || strstr(voice_str,"32分钟"))
+		return 32;
+	else if(strstr(voice_str,"三十三分钟") || strstr(voice_str,"33分钟"))
+		return 33;
+	else if(strstr(voice_str,"三十四分钟") || strstr(voice_str,"34分钟"))
+		return 34;
+	else if(strstr(voice_str,"三十五分钟") || strstr(voice_str,"35分钟"))
+		return 35;
+	else if(strstr(voice_str,"三十六分钟") || strstr(voice_str,"36分钟"))
+		return 36;
+	else if(strstr(voice_str,"三十七分钟") || strstr(voice_str,"37分钟"))
+		return 37;
+	else if(strstr(voice_str,"三十八分钟") || strstr(voice_str,"38分钟"))
+		return 38;
+	else if(strstr(voice_str,"三十九分钟") || strstr(voice_str,"39分钟"))
+		return 39;
+	else if(strstr(voice_str,"四十一分钟") || strstr(voice_str,"41分钟"))
+		return 41;
+	else if(strstr(voice_str,"四十二分钟") || strstr(voice_str,"42分钟"))
+		return 42;
+	else if(strstr(voice_str,"四十三分钟") || strstr(voice_str,"43分钟"))
+		return 43;
+	else if(strstr(voice_str,"四十四分钟") || strstr(voice_str,"44分钟"))
+		return 44;
+	else if(strstr(voice_str,"四十五分钟") || strstr(voice_str,"45分钟"))
+		return 45;
+	else if(strstr(voice_str,"四十六分钟") || strstr(voice_str,"46分钟"))
+		return 46;
+	else if(strstr(voice_str,"四十七分钟") || strstr(voice_str,"47分钟"))
+		return 47;
+	else if(strstr(voice_str,"四十八分钟") || strstr(voice_str,"48分钟"))
+		return 48;
+	else if(strstr(voice_str,"四十九分钟") || strstr(voice_str,"49分钟"))
+		return 49;
+	else if(strstr(voice_str,"五十一分钟") || strstr(voice_str,"51分钟"))
+		return 51;
+	else if(strstr(voice_str,"五十二分钟") || strstr(voice_str,"52分钟"))
+		return 52;
+	else if(strstr(voice_str,"五十三分钟") || strstr(voice_str,"53分钟"))
+		return 53;
+	else if(strstr(voice_str,"五十四分钟") || strstr(voice_str,"54分钟"))
+		return 54;
+	else if(strstr(voice_str,"五十五分钟") || strstr(voice_str,"55分钟"))
+		return 55;
+	else if(strstr(voice_str,"五十六分钟") || strstr(voice_str,"56分钟"))
+		return 56;
+	else if(strstr(voice_str,"五十七分钟") || strstr(voice_str,"57分钟"))
+		return 57;
+	else if(strstr(voice_str,"五十八分钟") || strstr(voice_str,"58分钟"))
+		return 58;
+	else if(strstr(voice_str,"五十九分钟") || strstr(voice_str,"59分钟"))
+		return 59;
+	else if(strstr(voice_str,"十一分钟") || strstr(voice_str,"11分钟"))
+		return 11;
+	else if(strstr(voice_str,"十二分钟") || strstr(voice_str,"12分钟"))
+		return 12;
+	else if(strstr(voice_str,"十三分钟") || strstr(voice_str,"13分钟"))
+		return 13;
+	else if(strstr(voice_str,"十四分钟") || strstr(voice_str,"14分钟"))
+		return 14;
+	else if(strstr(voice_str,"十五分钟") || strstr(voice_str,"15分钟"))
+		return 15;
+	else if(strstr(voice_str,"十六分钟") || strstr(voice_str,"16分钟"))
+		return 16;
+	else if(strstr(voice_str,"十七分钟") || strstr(voice_str,"17分钟"))
+		return 17;
+	else if(strstr(voice_str,"十八分钟") || strstr(voice_str,"18分钟"))
+		return 18;
+	else if(strstr(voice_str,"十九分钟") || strstr(voice_str,"19分钟"))
+		return 19;
+	else if(strstr(voice_str,"二十分钟") || strstr(voice_str,"20分钟"))
+		return 20;
+	else if(strstr(voice_str,"三十分钟") || strstr(voice_str,"30分钟"))
+		return 30;
+	else if(strstr(voice_str,"四十分钟") || strstr(voice_str,"40分钟"))
+		return 40;
+	else if(strstr(voice_str,"五十分钟") || strstr(voice_str,"50分钟"))
+		return 50;
+	else if(strstr(voice_str,"六十分钟") || strstr(voice_str,"60分钟"))
+		return 60;
+	else if(strstr(voice_str,"十分钟") || strstr(voice_str,"10分钟"))
+		return 10;
+	else if(strstr(voice_str,"一分钟") || strstr(voice_str,"1分钟"))
+		return 1;
+	else if(strstr(voice_str,"二分钟") || strstr(voice_str,"2分钟") || strstr(voice_str,"两分钟"))
+		return 2;
+	else if(strstr(voice_str,"三分钟") || strstr(voice_str,"3分钟"))
+		return 3;
+	else if(strstr(voice_str,"四分钟") || strstr(voice_str,"4分钟"))
+		return 4;
+	else if(strstr(voice_str,"五分钟") || strstr(voice_str,"5分钟"))
+		return 5;
+	else if(strstr(voice_str,"六分钟") || strstr(voice_str,"6分钟"))
+		return 6;
+	else if(strstr(voice_str,"七分钟") || strstr(voice_str,"7分钟"))
+		return 7;
+	else if(strstr(voice_str,"八分钟") || strstr(voice_str,"8分钟"))
+		return 8;
+	else if(strstr(voice_str,"九分钟") || strstr(voice_str,"9分钟"))
+		return 9;
+	else
+		return 255;
+}
+int judge_sec_delay(char *voice_str)
+{
+	if(strstr(voice_str,"二十一秒") || strstr(voice_str,"21秒"))
+		return 21;
+	else if(strstr(voice_str,"二十二秒") || strstr(voice_str,"22秒"))
+		return 22;
+	else if(strstr(voice_str,"二十三秒") || strstr(voice_str,"23秒"))
+		return 23;
+	else if(strstr(voice_str,"二十四秒") || strstr(voice_str,"24秒"))
+		return 24;
+	else if(strstr(voice_str,"二十五秒") || strstr(voice_str,"25秒"))
+		return 25;
+	else if(strstr(voice_str,"二十六秒") || strstr(voice_str,"26秒"))
+		return 26;
+	else if(strstr(voice_str,"二十七秒") || strstr(voice_str,"27秒"))
+		return 27;
+	else if(strstr(voice_str,"二十八秒") || strstr(voice_str,"28秒"))
+		return 28;
+	else if(strstr(voice_str,"二十九秒") || strstr(voice_str,"29秒"))
+		return 29;
+	else if(strstr(voice_str,"三十一秒") || strstr(voice_str,"31秒"))
+		return 31;
+	else if(strstr(voice_str,"三十二秒") || strstr(voice_str,"32秒"))
+		return 32;
+	else if(strstr(voice_str,"三十三秒") || strstr(voice_str,"33秒"))
+		return 33;
+	else if(strstr(voice_str,"三十四秒") || strstr(voice_str,"34秒"))
+		return 34;
+	else if(strstr(voice_str,"三十五秒") || strstr(voice_str,"35秒"))
+		return 35;
+	else if(strstr(voice_str,"三十六秒") || strstr(voice_str,"36秒"))
+		return 36;
+	else if(strstr(voice_str,"三十七秒") || strstr(voice_str,"37秒"))
+		return 37;
+	else if(strstr(voice_str,"三十八秒") || strstr(voice_str,"38秒"))
+		return 38;
+	else if(strstr(voice_str,"三十九秒") || strstr(voice_str,"39秒"))
+		return 39;
+	else if(strstr(voice_str,"四十一秒") || strstr(voice_str,"41秒"))
+		return 41;
+	else if(strstr(voice_str,"四十二秒") || strstr(voice_str,"42秒"))
+		return 42;
+	else if(strstr(voice_str,"四十三秒") || strstr(voice_str,"43秒"))
+		return 43;
+	else if(strstr(voice_str,"四十四秒") || strstr(voice_str,"44秒"))
+		return 44;
+	else if(strstr(voice_str,"四十五秒") || strstr(voice_str,"45秒"))
+		return 45;
+	else if(strstr(voice_str,"四十六秒") || strstr(voice_str,"46秒"))
+		return 46;
+	else if(strstr(voice_str,"四十七秒") || strstr(voice_str,"47秒"))
+		return 47;
+	else if(strstr(voice_str,"四十八秒") || strstr(voice_str,"48秒"))
+		return 48;
+	else if(strstr(voice_str,"四十九秒") || strstr(voice_str,"49秒"))
+		return 49;
+	else if(strstr(voice_str,"五十一秒") || strstr(voice_str,"51秒"))
+		return 51;
+	else if(strstr(voice_str,"五十二秒") || strstr(voice_str,"52秒"))
+		return 52;
+	else if(strstr(voice_str,"五十三秒") || strstr(voice_str,"53秒"))
+		return 53;
+	else if(strstr(voice_str,"五十四秒") || strstr(voice_str,"54秒"))
+		return 54;
+	else if(strstr(voice_str,"五十五秒") || strstr(voice_str,"55秒"))
+		return 55;
+	else if(strstr(voice_str,"五十六秒") || strstr(voice_str,"56秒"))
+		return 56;
+	else if(strstr(voice_str,"五十七秒") || strstr(voice_str,"57秒"))
+		return 57;
+	else if(strstr(voice_str,"五十八秒") || strstr(voice_str,"58秒"))
+		return 58;
+	else if(strstr(voice_str,"五十九秒") || strstr(voice_str,"59秒"))
+		return 59;
+	else if(strstr(voice_str,"十一秒") || strstr(voice_str,"11秒"))
+		return 11;
+	else if(strstr(voice_str,"十二秒") || strstr(voice_str,"12秒"))
+		return 12;
+	else if(strstr(voice_str,"十三秒") || strstr(voice_str,"13秒"))
+		return 13;
+	else if(strstr(voice_str,"十四秒") || strstr(voice_str,"14秒"))
+		return 14;
+	else if(strstr(voice_str,"十五秒") || strstr(voice_str,"15秒"))
+		return 15;
+	else if(strstr(voice_str,"十六秒") || strstr(voice_str,"16秒"))
+		return 16;
+	else if(strstr(voice_str,"十七秒") || strstr(voice_str,"17秒"))
+		return 17;
+	else if(strstr(voice_str,"十八秒") || strstr(voice_str,"18秒"))
+		return 18;
+	else if(strstr(voice_str,"十九秒") || strstr(voice_str,"19秒"))
+		return 19;
+	else if(strstr(voice_str,"二十秒") || strstr(voice_str,"20秒"))
+		return 20;
+	else if(strstr(voice_str,"三十秒") || strstr(voice_str,"30秒"))
+		return 30;
+	else if(strstr(voice_str,"四十秒") || strstr(voice_str,"40秒"))
+		return 40;
+	else if(strstr(voice_str,"五十秒") || strstr(voice_str,"50秒"))
+		return 50;
+	else if(strstr(voice_str,"六十秒") || strstr(voice_str,"60秒"))
+		return 60;
+	else if(strstr(voice_str,"十秒") || strstr(voice_str,"10秒"))
+		return 10;
+	else if(strstr(voice_str,"一秒") || strstr(voice_str,"1秒"))
+		return 1;
+	else if(strstr(voice_str,"二秒") || strstr(voice_str,"2秒") || strstr(voice_str,"两秒"))
+		return 2;
+	else if(strstr(voice_str,"三秒") || strstr(voice_str,"3秒"))
+		return 3;
+	else if(strstr(voice_str,"四秒") || strstr(voice_str,"4秒"))
+		return 4;
+	else if(strstr(voice_str,"五秒") || strstr(voice_str,"5秒"))
+		return 5;
+	else if(strstr(voice_str,"六秒") || strstr(voice_str,"6秒"))
+		return 6;
+	else if(strstr(voice_str,"七秒") || strstr(voice_str,"7秒"))
+		return 7;
+	else if(strstr(voice_str,"八秒") || strstr(voice_str,"8秒"))
+		return 8;
+	else if(strstr(voice_str,"九秒") || strstr(voice_str,"9秒"))
+		return 9;
+	else
+		return 255;
+}
 

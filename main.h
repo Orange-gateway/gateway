@@ -26,6 +26,7 @@
  pthread_mutex_t mutex_down_file;//下载文件锁
  pthread_mutex_t mutex_room;//房间锁
  pthread_mutex_t mutex_human;//人体文件互斥锁
+ pthread_mutex_t mutex_delay;//智能插座文件互斥锁
  pthread_mutex_t mutex_resend;//重发互斥锁
  pthread_cond_t cond;
  pthread_mutex_t mutex_waite;
@@ -50,6 +51,18 @@
  	struct human *next;
  }HB;
  HB *human_head,*human_z,*human_d;
+ typedef struct delay //延时控制结构体（智能插座）
+ {
+ 	char dev_mac[17];
+ 	char dev_port[3];
+ 	char dev_id[20];
+ 	char dev_type[10];
+ 	char cmd[3];
+ 	int delay_time[3];
+ 	int flag;
+ 	struct delay *next;
+ }DELAY;
+ DELAY *delay_head,*delay_z,*delay_d;
  char str_from_server[819200];//中间转换缓冲区
  char scene_list[BUFFSIZE];//情景列表缓存区
  char scene_detail[819200];//情景明细缓存区

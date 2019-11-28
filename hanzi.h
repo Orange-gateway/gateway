@@ -7,6 +7,9 @@ char* str_judge(char *str);
 char* tiqu(char *str);
 int judge_number(char *voice_str);
 int judge_number_kt(char *voice_str);
+int judge_hour_delay(char *voice_str);
+int judge_min_delay(char *voice_str);
+int judge_sec_delay(char *voice_str);
 #endif
 
 

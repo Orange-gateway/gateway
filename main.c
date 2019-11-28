@@ -19,7 +19,8 @@ int main(int argc,char* argv[])
 	onekey_or_study_flag=2;
 	resend_head = resend_z = resend_d = NULL;
 	human_head = human_z = human_d = NULL;
-	int ret_usart,ret0,ret1,ret2,ret3,ret4,ret5,ret6,ret7;          //接受返回值，用于判断
+	delay_head = delay_z = delay_d = NULL;
+	int ret_usart,ret0,ret1,ret2,ret3,ret4,ret5,ret6,ret7,ret8;          //接受返回值，用于判断
 	identify_flag = 0;
 	go_net_flag = 0;
 	NET_FLAG = 0;
@@ -51,7 +52,7 @@ int main(int argc,char* argv[])
 	sa.sa_handler = SIG_IGN;
 	sigaction( SIGPIPE, &sa, 0 );
 	file_init_common();
-	pthread_t id_usart,id_heart_jump,id_resend,id_timer,id_get_status,id_human_body,id_gateway_heart;
+	pthread_t id_usart,id_heart_jump,id_resend,id_timer,id_get_status,id_human_body,id_my_delay,id_gateway_heart;
 	ret0 = pthread_create(&id_usart,NULL,(void*)pthread_usart_receive,NULL);
 	if(ret0 < 0)
 		{	
@@ -86,6 +87,11 @@ int main(int argc,char* argv[])
 	if(ret6 < 0)
 		{
 			printf("id_human_body create fault\n");
+		}
+	ret8 = pthread_create(&id_my_delay,NULL,(void*)my_delay,NULL);
+	if(ret8 < 0)
+		{
+			printf("id_my_delay create fault\n");
 		}
 	ret7 = pthread_create(&id_gateway_heart,NULL,(void*)gateway_send_heart_jump,NULL);
 	if(ret7 < 0)

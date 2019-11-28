@@ -195,6 +195,10 @@ void pthread_u_send(char* str)
 				{
 					get_wireless_link_siganl("ath0");
 				}
+				else if( strcmp("set_dev_timer",api->valuestring) == 0 )
+				{
+					dev_set_time(root,str);
+				}
 				break;
 			}
 			while_root = while_root->next;
@@ -964,6 +968,113 @@ void human_zt(char *mac,char *port,char *id,char *type,time_t num)
 	}
 	pthread_mutex_unlock(&mutex_human);
 }
+void my_delay(void)
+{
+	struct tm* p;
+	DELAY *p_delay = NULL;
+	time_t mytime;
+	int first_flag = 1;
+	uint8_t final_cmd[16];
+	while(1)
+	{
+		p_delay = delay_head;
+		time(&mytime);
+		p = localtime(&mytime);
+		while( p_delay )
+		{
+			pthread_mutex_lock(&mutex_delay);
+			if( p_delay->flag)
+			{
+				if(p_delay->delay_time[0] == p->tm_hour && p_delay->delay_time[1] == p->tm_min && p_delay->delay_time[2] == p->tm_sec)
+				{
+					memset(final_cmd,0,16);
+					cmd_mix(p_delay->dev_mac,p_delay->dev_port,p_delay->cmd,final_cmd);
+					resend_zt(16,final_cmd,p_delay->dev_id,p_delay->dev_type);
+					usart_send(fd,final_cmd,16);
+					p_delay->flag = 0;
+					my_delay_file();
+				}
+				else if(p_delay->delay_time[0] == p->tm_hour && p_delay->delay_time[1] == p->tm_min && first_flag && p_delay->delay_time[2] < p->tm_sec)
+				{
+					memset(final_cmd,0,16);
+					cmd_mix(p_delay->dev_mac,p_delay->dev_port,p_delay->cmd,final_cmd);
+					resend_zt(16,final_cmd,p_delay->dev_id,p_delay->dev_type);
+					usart_send(fd,final_cmd,16);
+					p_delay->flag = 0;
+					my_delay_file();
+				}
+			}
+			pthread_mutex_unlock(&mutex_delay);
+			p_delay = p_delay->next;
+		}
+		first_flag = 0;
+		sleep(1);
+	}
+}
+void delay_zt(char *cmd,char *mac,char *port,char *dev_id,char *dev_type,int delay_hour,int delay_min,int delay_sec,int del_flag)//del_flag 0:1  set:del
+{
+	DELAY *p = NULL;
+	p = delay_head;
+	pthread_mutex_lock(&mutex_delay);
+	if(p==NULL && !del_flag)
+	{
+		delay_d = (DELAY *)malloc(sizeof(DELAY));
+		memset(delay_d,0,sizeof(DELAY));
+		memcpy(delay_d->cmd,cmd,3);
+		memcpy(delay_d->dev_mac,mac,17);
+		memcpy(delay_d->dev_port,port,3);
+		memcpy(delay_d->dev_id,dev_id,strlen(dev_id)+1);
+		memcpy(delay_d->dev_type,dev_type,strlen(dev_type)+1);
+		delay_d->delay_time[0] = delay_hour;
+		delay_d->delay_time[1] = delay_min;
+		delay_d->delay_time[2] = delay_sec;
+		delay_d->flag = 1;
+		delay_head = delay_z = delay_d;
+		delay_d->next = NULL;
+	}
+	else
+	{
+		while( p )
+		{
+			if(!mac_and_port_judge_delay(p,mac,port))
+			{
+				memset(p->cmd,0,3);
+				memcpy(p->cmd,cmd,3);
+				memset(p->dev_id,0,20);
+				memcpy(p->dev_id,dev_id,strlen(dev_id)+1);
+				memset(p->dev_type,0,10);
+				memcpy(p->dev_type,dev_type,strlen(dev_type)+1);
+				p->delay_time[0] = delay_hour;
+				p->delay_time[1] = delay_min;
+				p->delay_time[2] = delay_sec;
+				if(!del_flag)
+					p->flag = 1;
+				else if(del_flag)
+					p->flag = 0;
+				break;
+			}
+			else if(p->next == NULL && !del_flag)
+			{
+				delay_d = (DELAY *)malloc(sizeof(DELAY));
+				memset(delay_d,0,sizeof(DELAY));
+				memcpy(delay_d->cmd,cmd,3);
+				memcpy(delay_d->dev_mac,mac,17);
+				memcpy(delay_d->dev_port,port,3);
+				memcpy(delay_d->dev_id,dev_id,strlen(dev_id)+1);
+				memcpy(delay_d->dev_type,dev_type,strlen(dev_type)+1);
+				delay_d->delay_time[0] = delay_hour;
+				delay_d->delay_time[1] = delay_min;
+				delay_d->delay_time[2] = delay_sec;
+				delay_d->flag = 1;
+				p->next = delay_d;
+				delay_d->next = NULL;
+				break;
+			}
+			p = p->next;
+		}
+	}
+	pthread_mutex_unlock(&mutex_delay);
+}
 /*更新重发列表*/
 void up_resend(uint8_t *data)
 {
@@ -1195,6 +1306,8 @@ void get_status(void)
 			else if(strcmp(tem_type->valuestring,"010103")==0)
 				status_flag=1;
 			else if(strcmp(tem_type->valuestring,"010104")==0)
+				status_flag=1;
+			else if(strcmp(tem_type->valuestring,"010105")==0)
 				status_flag=1;
 			else if(strcmp(tem_type->valuestring,"010201")==0)
 				status_flag=1;
