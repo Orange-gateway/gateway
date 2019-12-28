@@ -4433,7 +4433,7 @@ void get_hw_code_ser(cJSON *root)
 				final_cmd=NULL;
 				pthread_mutex_lock(&mutex_code);
 				cJSON *code_id_root = cJSON_Parse(code_id);
-				if(code_id_root != NULL)
+				if(code_id_root != NULL && strcmp(get_hw_id->valuestring,"0"))
 				{
 					if(code_id_root->child != NULL)
 					{
@@ -4516,7 +4516,7 @@ void get_hw_code_ser(cJSON *root)
 				final_cmd=NULL;
 				pthread_mutex_lock(&mutex_code);
 				cJSON *code_id_root = cJSON_Parse(code_id);
-				if(code_id_root != NULL)
+				if(code_id_root != NULL && strcmp(get_hw_id->valuestring,"0"))
 				{
 					if(code_id_root->child != NULL)
 					{
@@ -4646,7 +4646,7 @@ void down_room_list(char *str)
 	int room_fd = open("/root/room_list.txt",O_RDWR|O_CREAT|O_TRUNC,0777);
 	write(room_fd,str,strlen(str));
 	fsync(room_fd);
-	memset(room_list,0,10240);
+	memset(room_list,0,BUFFSIZE_ROOM);
 	memcpy(room_list,str,strlen(str));
 	close(room_fd);
 	pthread_mutex_unlock(&mutex_room);
@@ -4657,7 +4657,7 @@ void down_scene_mx(char *str)
 	int scene_detail_fd = open("/root/scene_detail.txt",O_RDWR|O_CREAT|O_TRUNC,0777);
 	write(scene_detail_fd,str,strlen(str));
 	fsync(scene_detail_fd);
-	memset(scene_detail,0,819200);
+	memset(scene_detail,0,BUFFSIZE_MAX);
 	memcpy(scene_detail,str,strlen(str));
 	close(scene_detail_fd);
 	pthread_mutex_unlock(&mutex_scene);
@@ -4669,7 +4669,7 @@ void down_dev_list(char *str)
 	int my_len = strlen(str);
 	write(device_list_fd,str,my_len);
 	fsync(device_list_fd);
-	memset(device_list,0,819200);
+	memset(device_list,0,BUFFSIZE_MAX);
 	memcpy(device_list,str,my_len);
 	close(device_list_fd);
 	pthread_mutex_unlock(&mutex_sl);

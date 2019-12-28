@@ -24,10 +24,10 @@ void file_init_common()
 
 /*	初始化情景明细文件  */
 	
-	memset(scene_detail,0,819200);
+	memset(scene_detail,0,BUFFSIZE_MAX);
 	int scene_detail_fd = open("/root/scene_detail.txt",O_RDWR|O_CREAT,0777);
 
-	int scene_detail_read_len = read(scene_detail_fd,scene_detail,819200);
+	int scene_detail_read_len = read(scene_detail_fd,scene_detail,BUFFSIZE_MAX);
 
 	close(scene_detail_fd);
 	if(json_checker(scene_detail)==0 && scene_detail_read_len>0)
@@ -35,7 +35,7 @@ void file_init_common()
 	else
 	{
 		printf("scene_detail not json!!!\n");
-		memset(scene_detail,0,819200);
+		memset(scene_detail,0,BUFFSIZE_MAX);
 		scene_detail_fd = open("/root/scene_detail.txt",O_RDWR|O_CREAT|O_TRUNC,0777);
 		memcpy(scene_detail,"{}",2);
 		write(scene_detail_fd,scene_detail,2);
@@ -46,17 +46,17 @@ void file_init_common()
 
 /* 	初始化设备列表文件  */
 	
-	memset(device_list,0,BUFFSIZE);
+	memset(device_list,0,BUFFSIZE_MAX);
 	int device_list_fd = open("/root/device_list.txt",O_RDWR|O_CREAT,0777);
 
-	int device_list_read_len = read(device_list_fd,device_list,819200);
+	int device_list_read_len = read(device_list_fd,device_list,BUFFSIZE_MAX);
 	close(device_list_fd);
 	if(json_checker(device_list)==0  && device_list_read_len>0)
 		;
 	else
 	{
 		printf("device_list not json!!!\n");
-		memset(device_list,0,819200);
+		memset(device_list,0,BUFFSIZE_MAX);
 		device_list_fd = open("/root/device_list.txt",O_RDWR|O_CREAT|O_TRUNC,0777);
 		memcpy(device_list,"{}",2);
 		write(device_list_fd,device_list,2);
@@ -225,9 +225,9 @@ void file_init_common()
 	
 	/*初始化房间列表文件*/
 	pthread_mutex_lock(&mutex_room);
-	memset(room_list,0,10240);
+	memset(room_list,0,BUFFSIZE_ROOM);
 	int room_fd = open("/root/room_list.txt",O_RDWR|O_CREAT,0777);
-	int room_fd_len = read(room_fd,room_list,10240);
+	int room_fd_len = read(room_fd,room_list,BUFFSIZE_ROOM);
 	close(room_fd);
 	if(json_checker(room_list)==0 && room_fd_len > 0)
 	{
@@ -237,7 +237,7 @@ void file_init_common()
 	{
 		printf("room_list not json\n");
 		room_fd = open("/root/room_list.txt",O_RDWR|O_CREAT|O_TRUNC,0777);
-		memset(room_list,0,10240);
+		memset(room_list,0,BUFFSIZE_ROOM);
 		memcpy(room_list,"{}",2);
 		write(room_fd,room_list,2);
 		fsync(room_fd);

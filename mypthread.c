@@ -377,7 +377,7 @@ void pthread_client_receive(void)
 {
 	int flag=0,ret_recv,str_len=0,i,num=0;
 	char c_send[8192];//客户端数据缓冲区
-	memset(str_from_server,0,819200);
+	memset(str_from_server,0,BUFFSIZE_MAX);
 	memset(c_send,0,8192);
 	signal(6,reconnect);
 	while(1)

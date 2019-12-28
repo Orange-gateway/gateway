@@ -3,6 +3,8 @@
 #include "pthread.h"
 #include <stdint.h>
 #define BUFFSIZE 81920
+#define BUFFSIZE_MAX 819200
+#define BUFFSIZE_ROOM 10240
  int cd;//socket 描述符
  int down_cd;
  int fd;//串口描述符
@@ -63,17 +65,17 @@
  	struct delay *next;
  }DELAY;
  DELAY *delay_head,*delay_z,*delay_d;
- char str_from_server[819200];//中间转换缓冲区
+ char str_from_server[BUFFSIZE_MAX];//中间转换缓冲区
  char scene_list[BUFFSIZE];//情景列表缓存区
- char scene_detail[819200];//情景明细缓存区
- char device_list[819200];//设备列表缓存区
+ char scene_detail[BUFFSIZE_MAX];//情景明细缓存区
+ char device_list[BUFFSIZE_MAX];//设备列表缓存区
  char timer_list[BUFFSIZE];//定时器列表缓存区
  char secure_set_list[BUFFSIZE];//安放设置列表缓存区
  char multi_bind[BUFFSIZE];//多联绑定缓存区
  char voice_list[BUFFSIZE];//离线语音列表缓存区
  char device_state_list[BUFFSIZE];//设备状态缓存区
  char code_id[BUFFSIZE];//码库id缓存区
- char room_list[10240];//房间列表缓冲区
+ char room_list[BUFFSIZE_ROOM];//房间列表缓冲区
  char gw_sn[100];//sn缓存区
  int identify_flag;//身份验证成功标志
  int go_net_flag;//允许入网标志
