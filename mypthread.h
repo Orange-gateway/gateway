@@ -14,7 +14,7 @@ void pthread_usart_receive(void);
 void pthread_client_receive(void);
 /*心跳机制*/
 void heart_jump(void);
-void reconnect(int num);
+void reconnect(void);
 void re_send_success_or_failed(RSD *p,char *dev_id,char *dev_type,char *data_str,int ret_num,char *message);
 void re_send(void);
 void resend_zt(int len,uint8_t *cmd,char *dev_id,char *dev_type);
@@ -25,6 +25,5 @@ void human_zt(char *mac,char *port,char *id,char *type,time_t num);
 void human_check(void);
 void my_delay(void);
 void delay_zt(char *cmd,char *mac,char *port,char *dev_id,char *dev_type,int delay_hour,int delay_min,int delay_sec,int del_flag);
-void gateway_send_heart_jump(void);
 void gateway_on_off(void);
 #endif

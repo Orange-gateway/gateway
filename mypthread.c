@@ -9,10 +9,12 @@ void pthread_u_send(char* str)
 	{
 		if(!identify_flag)
 		{
-			char *mac = malloc(13);
+			//char *mac = malloc(13);
+			char mac[13];
 			memset(mac,0,13);
 			get_mac(mac);
-			char *str_json = malloc(256);
+			//char *str_json = malloc(256);
+			char str_json[256];
 			memset(str_json,0,256);
 			int sn_fd = open("/root/sn.txt",O_RDWR|O_CREAT,0777);
 			memset(gw_sn,0,100);
@@ -32,10 +34,10 @@ void pthread_u_send(char* str)
 				sn_pwd_str(str_json,mac);
 				send(cd,str_json,strlen(str_json),0);
 			}
-			free(mac);
-			mac=NULL;
-			free(str_json);
-			str_json=NULL;
+			//free(mac);
+			//mac=NULL;
+			//free(str_json);
+			//str_json=NULL;
 		}
 	}
 	else if(strcmp(root->child->string,"gw_add_user") ==0)
@@ -337,11 +339,11 @@ void pthread_usart_receive(void)
 								uint8_t *my_u_data = NULL;
 								my_u_data =(uint8_t*)malloc(data_len);//解析数据接收缓冲区
 								memset(my_u_data,0,data_len);
-
+#if 1
 								for(i=0;i<data_len;i++)
 									my_u_data[i]=rc_buff[i];
-
-/*
+#endif
+#if 0
 								printf("usart receive is:");
 								for(i=0;i<data_len;i++)
 								{
@@ -349,7 +351,7 @@ void pthread_usart_receive(void)
 									printf("%.2x  ",my_u_data[i]);
 								}
 								printf("\n");
-*/
+#endif
 								up_resend(my_u_data);//更新重发列表
 								
 								pth_creat_my(pthread_v_send,my_u_data);
@@ -375,15 +377,15 @@ void pthread_usart_receive(void)
 /*线程接收服务器函数*/
 void pthread_client_receive(void)
 {
-	int flag=0,ret_recv,str_len=0,i,num=0;
+	int flag=0,ret_recv,str_len=0,i;
 	char c_send[8192];//客户端数据缓冲区
 	memset(str_from_server,0,BUFFSIZE_MAX);
 	memset(c_send,0,8192);
-	signal(6,reconnect);
+	
 	while(1)
 	{
 		ret_recv=recv(cd,c_send,8192,0);
-
+		
 		if(ret_recv>0)
 		{	
 			for(i=0;i<ret_recv;i++)
@@ -393,20 +395,11 @@ void pthread_client_receive(void)
 			}
 			memset(c_send,0,sizeof(c_send));
 		}
-		else if(ret_recv == 0)
+		else if(ret_recv <= 0)
 		{
-			num++;
-			if(num>5)
-			{
-				printf("server is gone\n");
-				kill_gateway();
-			}
-
-		}
-		else
-		{
-			sleep(1);
-			continue;
+			identify_flag = NET_FLAG = 0;
+			reconnect();
+			sleep(2);
 		}
 		while(1)
 		{
@@ -435,10 +428,13 @@ void pthread_client_receive(void)
 					memcpy(r_str,str_from_server,flag+1);
 					r_str[flag]='\0';
 					replace_character(r_str);
-					
+		
 					if(json_checker(r_str)==0)
 					{
-						first = time(NULL);
+						alive = 1;
+						#if 0
+						printf("recv is : %s\n",r_str);
+						#endif
 						pth_creat_my(pthread_u_send,r_str);
 					}
 					else
@@ -446,7 +442,7 @@ void pthread_client_receive(void)
 						free(r_str);
 						r_str=NULL;
 					}
-					
+		
 					delete_len_from_str(str_from_server,flag+1,&str_len);
 				}
 				else if(flag==14)
@@ -464,7 +460,7 @@ void pthread_client_receive(void)
 	}
 }
 /*重连函数*/
-void reconnect(int num)
+void reconnect(void)
 {
 	shutdown(cd,SHUT_RDWR);
 	close(cd);
@@ -473,27 +469,39 @@ void reconnect(int num)
 /*心跳机制*/
 void heart_jump(void)
 {
-	int time_diff=0;
-	first=time(NULL);
-	second=time(NULL);
+	int SendCount = 0;
+	cJSON *heart_root = cJSON_CreateObject();
+	cJSON_AddStringToObject(heart_root,"heart_jump","heart jump");
+	char *send_char = cJSON_PrintUnformatted(heart_root);
+	int my_len = strlen(send_char);
+	char *my_send_char = (char *)malloc(my_len+2);
+	memset(my_send_char,0,my_len+2);
+	memcpy(my_send_char,send_char,my_len);
+	strcat(my_send_char,"\n\0");
+	free(send_char);
+	send_char=NULL;
+	cJSON_Delete(heart_root);
+	heart_root=NULL;
 	while(1)
 	{
-		sleep(1);
-		second=time(NULL);
-		if( (abs((unsigned int)difftime(second,first))-time_diff) > 2)
+		sleep(5);
+		if(alive == 1)
 		{
-			first = time(NULL);
+			SendCount = alive = 0;
 		}
-		time_diff = abs((unsigned int)difftime(second,first));
-		if(time_diff > 30)
+		else
 		{
-			if(identify_flag==1) 
+			SendCount += 1;
+			if(SendCount > 3)
 			{
-				printf("first but not heart_jump\n");
-				kill_gateway();
+				SendCount = 0;
+				shutdown(cd,SHUT_RDWR);
+				close(cd);
 			}
-			first=second=time(NULL);
-			pthread_kill(id_client,6);
+			else if(identify_flag)
+			{
+				send(cd,my_send_char,my_len+1,0);
+			}
 		}
 	}
 }
@@ -1343,32 +1351,6 @@ void get_status(void)
 	cJSON_Delete(dev_list_data);
 	dev_list_data=NULL;
 }
-void gateway_send_heart_jump(void)
-{
-	while(1)
-	{
-		if(NET_FLAG)
-		{
-			cJSON *heart_root = cJSON_CreateObject();
-			cJSON_AddStringToObject(heart_root,"heart_jump","heart jump");
-			char *send_char = cJSON_PrintUnformatted(heart_root);
-			int my_len = strlen(send_char);
-			char *my_send_char = (char *)malloc(my_len+2);
-			memset(my_send_char,0,my_len+2);
-			memcpy(my_send_char,send_char,my_len);
-			strcat(my_send_char,"\n\0");
-			send(cd,my_send_char,my_len+1,0);
-			free(send_char);
-			send_char=NULL;
-			free(my_send_char);
-			my_send_char=NULL;
-			cJSON_Delete(heart_root);
-			heart_root=NULL;
-		}
-		sleep(10);
-	}
-}
-
 void gateway_on_off(void)
 {
 	while(1)
@@ -1381,7 +1363,8 @@ void gateway_on_off(void)
 			sleep(3);
 		}
 		else
-			break;
+		{
+			sleep(4);
+		}
 	}
-	pthread_exit((void *)0);
 }

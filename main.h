@@ -11,8 +11,9 @@
  int NET_FLAG; 
  int device_flag;
  int down_gw_flag;
- time_t first;//接收更新时间
- time_t second;//心跳更新时间
+ int alive;
+ //time_t first;//接收更新时间
+ //time_t second;//心跳更新时间
  time_t net_record_time;//入网记录时间
  pthread_t id_client;//联网线程id，全局变量，拿来心跳kill重连
  pthread_mutex_t mutex_v;//全开全关下发锁

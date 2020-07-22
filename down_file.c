@@ -59,7 +59,8 @@ int tcp_client(char *hostname,int port)
 }
 int send_http_request(int sockfd,char *hostname,int port,char *filename)
 {
-	char *send_request_char = (char *)malloc(256);
+	//char *send_request_char = (char *)malloc(256);
+	char send_request_char[256];
 	memset(send_request_char,0,256);
 	sprintf(send_request_char,"GET %s HTTP/1.1\r\nHost: %s:%d\r\nConnection: Close\r\n\r\n",filename,hostname,port);
 	printf("send_request_char:%s",send_request_char);

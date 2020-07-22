@@ -411,6 +411,12 @@ void dev_com_con(cJSON *root)//无内存泄露问题
 						resend_zt(15+len_of_cmd,final_cmd,dev_id_this->valuestring,dev_type_this->valuestring);
 						usart_send(fd, final_cmd,15+len_of_cmd);
 					}
+					else if(strcmp(dev_type_this->valuestring,"060207")==0)
+					{
+						cmd_mix(data_mac->valuestring,data_port->valuestring,data_dev_cmd->valuestring,final_cmd);
+						resend_zt(15+len_of_cmd,final_cmd,dev_id_this->valuestring,dev_type_this->valuestring);
+						usart_send(fd, final_cmd,15+len_of_cmd);
+					}
 					free(final_cmd);
 					final_cmd = NULL;
 					if(flag_kg !=2)
@@ -492,8 +498,9 @@ void dev_com_con(cJSON *root)//无内存泄露问题
 																	kg=1;	
 																if(kg==1)//开关类
 																{
-																	uint8_t *multi_bind_final_cmd = NULL;
-																	multi_bind_final_cmd = (uint8_t *)malloc(16);
+																	//uint8_t *multi_bind_final_cmd = NULL;
+																	//multi_bind_final_cmd = (uint8_t *)malloc(16);
+																	uint8_t multi_bind_final_cmd[16];
 																	memset(multi_bind_final_cmd,0,16);
 																	if(flag_kg==1)
 																		cmd_mix(data_mac_for->valuestring,data_port_for->valuestring,"01",multi_bind_final_cmd);
@@ -501,13 +508,14 @@ void dev_com_con(cJSON *root)//无内存泄露问题
 																		cmd_mix(data_mac_for->valuestring,data_port_for->valuestring,"00",multi_bind_final_cmd);
 																	resend_zt(16,multi_bind_final_cmd,data_id->valuestring,data_type_for->valuestring);
 																	usart_send(fd,multi_bind_final_cmd,16);
-																	free(multi_bind_final_cmd);
-																	multi_bind_final_cmd=NULL;
+																	//free(multi_bind_final_cmd);
+																	//multi_bind_final_cmd=NULL;
 																}
 																else if(strcmp(data_type_for->valuestring,"010201")==0)//调光灯
 																{
-																	uint8_t *multi_bind_final_cmd = NULL;
-																	multi_bind_final_cmd = (uint8_t *)malloc(16);
+																	//uint8_t *multi_bind_final_cmd = NULL;
+																	//multi_bind_final_cmd = (uint8_t *)malloc(16);
+																	uint8_t multi_bind_final_cmd[16];
 																	memset(multi_bind_final_cmd,0,16);
 																	if(flag_kg==1)
 																		cmd_mix(data_mac_for->valuestring,data_port_for->valuestring,"ff",multi_bind_final_cmd);
@@ -515,13 +523,14 @@ void dev_com_con(cJSON *root)//无内存泄露问题
 																		cmd_mix(data_mac_for->valuestring,data_port_for->valuestring,"00",multi_bind_final_cmd);
 																	resend_zt(16,multi_bind_final_cmd,data_id->valuestring,data_type_for->valuestring);
 																	usart_send(fd,multi_bind_final_cmd,16);
-																	free(multi_bind_final_cmd);
-																	multi_bind_final_cmd = NULL;
+																	//free(multi_bind_final_cmd);
+																	//multi_bind_final_cmd = NULL;
 																}
 																else if(strcmp(data_type_for->valuestring,"010301")==0)//RGB
 																{
-																	uint8_t *multi_bind_final_cmd = NULL;
-																	multi_bind_final_cmd = (uint8_t *)malloc(19);
+																	//uint8_t *multi_bind_final_cmd = NULL;
+																	//multi_bind_final_cmd = (uint8_t *)malloc(19);
+																	uint8_t multi_bind_final_cmd[19];
 																	memset(multi_bind_final_cmd,0,19);
 																	pthread_mutex_lock(&mutex_zl);
 																	cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
@@ -583,13 +592,14 @@ void dev_com_con(cJSON *root)//无内存泄露问题
 																	}
 																	cJSON_Delete(device_state_list_data);
 																	device_state_list_data=NULL;
-																	free(multi_bind_final_cmd);
-																	multi_bind_final_cmd = NULL;
+																	//free(multi_bind_final_cmd);
+																	//multi_bind_final_cmd = NULL;
 																}
 																else if(strcmp(data_type_for->valuestring,"040201")==0)//百分比窗帘
 																{
-																	uint8_t *multi_bind_final_cmd = NULL;
-																	multi_bind_final_cmd = (uint8_t *)malloc(16);
+																	//uint8_t *multi_bind_final_cmd = NULL;
+																	//multi_bind_final_cmd = (uint8_t *)malloc(16);
+																	uint8_t multi_bind_final_cmd[16];
 																	memset(multi_bind_final_cmd,0,16);
 																	if(flag_kg==1)//触发源开
 																	cmd_mix(data_mac_for->valuestring,data_port_for->valuestring,"64",multi_bind_final_cmd);
@@ -597,13 +607,14 @@ void dev_com_con(cJSON *root)//无内存泄露问题
 																	cmd_mix(data_mac_for->valuestring,data_port_for->valuestring,"00",multi_bind_final_cmd);
 																	resend_zt(16,multi_bind_final_cmd,data_id->valuestring,data_type_for->valuestring);
 																	usart_send(fd,multi_bind_final_cmd,16);
-																	free(multi_bind_final_cmd);
-																	multi_bind_final_cmd = NULL;
+																	//free(multi_bind_final_cmd);
+																	//multi_bind_final_cmd = NULL;
 																}
 																else if(strcmp(data_type_for->valuestring,"040301")==0)//百叶窗帘
 																{
-																	uint8_t *multi_bind_final_cmd = NULL;
-																	multi_bind_final_cmd = (uint8_t *)malloc(17);
+																	//uint8_t *multi_bind_final_cmd = NULL;
+																	//multi_bind_final_cmd = (uint8_t *)malloc(17);
+																	uint8_t multi_bind_final_cmd[17];
 																	memset(multi_bind_final_cmd,0,17);
 																	if(flag_kg==1)//触发源开
 																	cmd_mix(data_mac_for->valuestring,data_port_for->valuestring,"6464",multi_bind_final_cmd);
@@ -611,8 +622,8 @@ void dev_com_con(cJSON *root)//无内存泄露问题
 																	cmd_mix(data_mac_for->valuestring,data_port_for->valuestring,"0000",multi_bind_final_cmd);
 																	resend_zt(17,multi_bind_final_cmd,data_id->valuestring,data_type_for->valuestring);
 																	usart_send(fd,multi_bind_final_cmd,17);
-																	free(multi_bind_final_cmd);
-																	multi_bind_final_cmd=NULL;
+																	//free(multi_bind_final_cmd);
+																	//multi_bind_final_cmd=NULL;
 																}
 																usleep(200000);
 																break;
@@ -700,32 +711,35 @@ void dev_room_con(cJSON *root)//无内存泄露问题
 						{
 							if(kg==1)//开关类型
 							{
-								uint8_t *final_cmd_of_switch = NULL;
-								final_cmd_of_switch = (uint8_t *)malloc(16);
+								//uint8_t *final_cmd_of_switch = NULL;
+								//final_cmd_of_switch = (uint8_t *)malloc(16);
+								uint8_t final_cmd_of_switch[16];
 								memset(final_cmd_of_switch,0,16);
 								cmd_mix(data_mac->valuestring,data_port->valuestring,"01",final_cmd_of_switch);
 								resend_zt(16,final_cmd_of_switch,data_id->valuestring,data_type->valuestring);
 								usart_send(fd,final_cmd_of_switch,16);
-								free(final_cmd_of_switch);
-								final_cmd_of_switch = NULL;
+								//free(final_cmd_of_switch);
+								//final_cmd_of_switch = NULL;
 								usleep(500000);
 							}
 							else if(strcmp(data_type->valuestring,"010201")==0)//调光灯
 							{
-								uint8_t *final_cmd_of_tgd = NULL;
-								final_cmd_of_tgd = (uint8_t *)malloc(16);
+								//uint8_t *final_cmd_of_tgd = NULL;
+								//final_cmd_of_tgd = (uint8_t *)malloc(16);
+								uint8_t final_cmd_of_tgd[16];
 								memset(final_cmd_of_tgd,0,16);
 								cmd_mix(data_mac->valuestring,data_port->valuestring,"ff",final_cmd_of_tgd);
 								resend_zt(16,final_cmd_of_tgd,data_id->valuestring,data_type->valuestring);
 								usart_send(fd,final_cmd_of_tgd,16);
-								free(final_cmd_of_tgd);
-								final_cmd_of_tgd = NULL;
+								//free(final_cmd_of_tgd);
+								//final_cmd_of_tgd = NULL;
 								usleep(200000);
 							}
 							else if(strcmp(data_type->valuestring,"010301")==0)//RGB
 							{
-								uint8_t *final_cmd_of_rgb = NULL;
-								final_cmd_of_rgb = (uint8_t *)malloc(19);
+								//uint8_t *final_cmd_of_rgb = NULL;
+								//final_cmd_of_rgb = (uint8_t *)malloc(19);
+								uint8_t final_cmd_of_rgb[19];
 								memset(final_cmd_of_rgb,0,19);
 								pthread_mutex_lock(&mutex_zl);
 								cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
@@ -772,32 +786,34 @@ void dev_room_con(cJSON *root)//无内存泄露问题
 								}
 								cJSON_Delete(device_state_list_data);
 								device_state_list_data=NULL;
-								free(final_cmd_of_rgb);
-								final_cmd_of_rgb = NULL;
+								//free(final_cmd_of_rgb);
+								//final_cmd_of_rgb = NULL;
 								usleep(200000);
 							}
 							else if(strcmp(data_type->valuestring,"040201")==0)//百分比窗帘
 							{
-								uint8_t *final_cmd_of_percen_cl = NULL;
-								final_cmd_of_percen_cl = (uint8_t *)malloc(16);
+								//uint8_t *final_cmd_of_percen_cl = NULL;
+								//final_cmd_of_percen_cl = (uint8_t *)malloc(16);
+								uint8_t final_cmd_of_percen_cl[16];
 								memset(final_cmd_of_percen_cl,0,16);
 								cmd_mix(data_mac->valuestring,data_port->valuestring,"64",final_cmd_of_percen_cl);
 								resend_zt(16,final_cmd_of_percen_cl,data_id->valuestring,data_type->valuestring);
 								usart_send(fd,final_cmd_of_percen_cl,16);
-								free(final_cmd_of_percen_cl);
-								final_cmd_of_percen_cl = NULL;
+								//free(final_cmd_of_percen_cl);
+								//final_cmd_of_percen_cl = NULL;
 								usleep(200000);
 							}
 							else if(strcmp(data_type->valuestring,"040301")==0)//百叶窗窗帘
 							{
-								uint8_t *final_cmd_of_blind_cl = NULL;
-								final_cmd_of_blind_cl = (uint8_t *)malloc(17);
+								//uint8_t *final_cmd_of_blind_cl = NULL;
+								//final_cmd_of_blind_cl = (uint8_t *)malloc(17);
+								uint8_t final_cmd_of_blind_cl[17];
 								memset(final_cmd_of_blind_cl,0,17);
 								cmd_mix(data_mac->valuestring,data_port->valuestring,"6464",final_cmd_of_blind_cl);
 								resend_zt(17,final_cmd_of_blind_cl,data_id->valuestring,data_type->valuestring);
 								usart_send(fd,final_cmd_of_blind_cl,17);
-								free(final_cmd_of_blind_cl);
-								final_cmd_of_blind_cl = NULL;
+								//free(final_cmd_of_blind_cl);
+								//final_cmd_of_blind_cl = NULL;
 								usleep(200000);
 							}
 						}
@@ -805,32 +821,35 @@ void dev_room_con(cJSON *root)//无内存泄露问题
 						{
 							if(kg==1)//墙壁开关类型
 							{
-								uint8_t *final_cmd_of_switch = NULL;
-								final_cmd_of_switch = (uint8_t *)malloc(16);
+								//uint8_t *final_cmd_of_switch = NULL;
+								//final_cmd_of_switch = (uint8_t *)malloc(16);
+								uint8_t final_cmd_of_switch[16];
 								memset(final_cmd_of_switch,0,16);
 								cmd_mix(data_mac->valuestring,data_port->valuestring,"00",final_cmd_of_switch);
 								resend_zt(16,final_cmd_of_switch,data_id->valuestring,data_type->valuestring);
 								usart_send(fd,final_cmd_of_switch,16);
-								free(final_cmd_of_switch);
-								final_cmd_of_switch = NULL;
+								//free(final_cmd_of_switch);
+								//final_cmd_of_switch = NULL;
 								usleep(500000);
 							}
 							else if(strcmp(data_type->valuestring,"010201")==0)//调光灯
 							{
-								uint8_t *final_cmd_of_tgd = NULL;
-								final_cmd_of_tgd = (uint8_t *)malloc(16);
+								//uint8_t *final_cmd_of_tgd = NULL;
+								//final_cmd_of_tgd = (uint8_t *)malloc(16);
+								uint8_t final_cmd_of_tgd[16];
 								memset(final_cmd_of_tgd,0,16);
 								cmd_mix(data_mac->valuestring,data_port->valuestring,"00",final_cmd_of_tgd);
 								resend_zt(16,final_cmd_of_tgd,data_id->valuestring,data_type->valuestring);
 								usart_send(fd,final_cmd_of_tgd,16);
-								free(final_cmd_of_tgd);
-								final_cmd_of_tgd = NULL;
+								//free(final_cmd_of_tgd);
+								//final_cmd_of_tgd = NULL;
 								usleep(200000);
 							}
 							else if(strcmp(data_type->valuestring,"010301")==0)//RGB
 							{
-								uint8_t *final_cmd_of_rgb = NULL;
-								final_cmd_of_rgb = (uint8_t *)malloc(19);
+								//uint8_t *final_cmd_of_rgb = NULL;
+								//final_cmd_of_rgb = (uint8_t *)malloc(19);
+								uint8_t final_cmd_of_rgb[19];
 								memset(final_cmd_of_rgb,0,19);
 								pthread_mutex_lock(&mutex_zl);
 								cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
@@ -879,32 +898,34 @@ void dev_room_con(cJSON *root)//无内存泄露问题
 								}
 								cJSON_Delete(device_state_list_data);
 								device_state_list_data=NULL;
-								free(final_cmd_of_rgb);
-								final_cmd_of_rgb = NULL;
+								//free(final_cmd_of_rgb);
+								//final_cmd_of_rgb = NULL;
 								usleep(200000);
 							}
 							else if(strcmp(data_type->valuestring,"040201")==0)//百分比窗帘
 							{
-								uint8_t *final_cmd_of_percen_cl = NULL;
-								final_cmd_of_percen_cl = (uint8_t *)malloc(16);
+								//uint8_t *final_cmd_of_percen_cl = NULL;
+								//final_cmd_of_percen_cl = (uint8_t *)malloc(16);
+								uint8_t final_cmd_of_percen_cl[16];
 								memset(final_cmd_of_percen_cl,0,16);
 								cmd_mix(data_mac->valuestring,data_port->valuestring,"00",final_cmd_of_percen_cl);
 								resend_zt(16,final_cmd_of_percen_cl,data_id->valuestring,data_type->valuestring);
 								usart_send(fd,final_cmd_of_percen_cl,16);
-								free(final_cmd_of_percen_cl);
-								final_cmd_of_percen_cl = NULL;
+								//free(final_cmd_of_percen_cl);
+								//final_cmd_of_percen_cl = NULL;
 								usleep(200000);
 							}
 							else if(strcmp(data_type->valuestring,"040301")==0)//百叶窗窗帘
 							{
-								uint8_t *final_cmd_of_blind_cl = NULL;
-								final_cmd_of_blind_cl = (uint8_t *)malloc(17);
+								//uint8_t *final_cmd_of_blind_cl = NULL;
+								//final_cmd_of_blind_cl = (uint8_t *)malloc(17);
+								uint8_t final_cmd_of_blind_cl[17];
 								memset(final_cmd_of_blind_cl,0,17);
 								cmd_mix(data_mac->valuestring,data_port->valuestring,"0000",final_cmd_of_blind_cl);
 								resend_zt(17,final_cmd_of_blind_cl,data_id->valuestring,data_type->valuestring);
 								usart_send(fd,final_cmd_of_blind_cl,17);
-								free(final_cmd_of_blind_cl);
-								final_cmd_of_blind_cl = NULL;
+								//free(final_cmd_of_blind_cl);
+								//final_cmd_of_blind_cl = NULL;
 								usleep(200000);
 							}
 						}
@@ -2533,6 +2554,199 @@ void voice_judge(cJSON *data_arr_jx,char *Voice_CMD)
 		}
 	}
 }
+static void voice_judge_number(char *voice_str,cJSON *tem_id,cJSON *tem_mac,cJSON *tem_port,cJSON *tem_type)
+{
+	if(strcmp(tem_type->valuestring,"010201")==0)//tgd
+	{
+		if(strstr(voice_str,"亮一点") || strstr(voice_str,"亮点"))
+		{
+			pthread_mutex_lock(&mutex_zl);
+			cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
+			pthread_mutex_unlock(&mutex_zl);
+			if(device_state_list_data != NULL)
+			{
+				if(device_state_list_data->child != NULL)
+				{
+					cJSON *my_device_state_list_data = cJSON_GetObjectItem(device_state_list_data,"data");
+					cJSON *while_device_state_list_data = my_device_state_list_data->child;
+					while(while_device_state_list_data != NULL)
+					{
+						if(strcmp(tem_id->valuestring,while_device_state_list_data->string)==0)
+						{
+							cJSON *dev_state_cjson = cJSON_GetObjectItem(my_device_state_list_data,tem_id->valuestring);
+							cJSON *my_dev_state = cJSON_GetObjectItem(dev_state_cjson,"dev_state");
+							uint8_t num_str;
+							uint8_t final_cmd[16];
+							memset(final_cmd,0,16);
+							str_to_hex(&num_str,my_dev_state->valuestring,1);
+							if(num_str>=0xe6)
+							{
+								cmd_mix(tem_mac->valuestring,tem_port->valuestring,"ff",final_cmd);
+								resend_zt(16,final_cmd,tem_id->valuestring,tem_type->valuestring);
+								usart_send(fd,final_cmd,16);
+							}
+							else
+							{
+								num_str+=0x19;
+								hex_to_str(&num_str,my_dev_state->valuestring,1);
+								cmd_mix(tem_mac->valuestring,tem_port->valuestring,my_dev_state->valuestring,final_cmd);
+								resend_zt(16,final_cmd,tem_id->valuestring,tem_type->valuestring);
+								usart_send(fd,final_cmd,16);
+							}
+							break;
+						}
+						while_device_state_list_data = while_device_state_list_data->next;
+					}
+				}
+			}
+			cJSON_Delete(device_state_list_data);
+			device_state_list_data= NULL;
+		}
+		else if(strstr(voice_str,"暗一点") || strstr(voice_str,"暗点"))
+		{
+			pthread_mutex_lock(&mutex_zl);
+			cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
+			pthread_mutex_unlock(&mutex_zl);
+			if(device_state_list_data != NULL)
+			{
+				if(device_state_list_data->child != NULL)
+				{
+					cJSON *my_device_state_list_data = cJSON_GetObjectItem(device_state_list_data,"data");
+					cJSON *while_device_state_list_data = my_device_state_list_data->child;
+					while(while_device_state_list_data != NULL)
+					{
+						if(strcmp(tem_id->valuestring,while_device_state_list_data->string)==0)
+						{
+							cJSON *dev_state_cjson = cJSON_GetObjectItem(my_device_state_list_data,tem_id->valuestring);
+							cJSON *my_dev_state = cJSON_GetObjectItem(dev_state_cjson,"dev_state");
+							uint8_t num_str;
+							uint8_t final_cmd[16];
+							memset(final_cmd,0,16);
+							str_to_hex(&num_str,my_dev_state->valuestring,1);
+							if(num_str<=0x19)
+							{
+								cmd_mix_scene(tem_mac->valuestring,tem_port->valuestring,"00",final_cmd);
+								resend_zt(16,final_cmd,tem_id->valuestring,tem_type->valuestring);
+								usart_send(fd,final_cmd,16);
+							}
+							else 
+							{
+								num_str-=0x19;
+								hex_to_str(&num_str,my_dev_state->valuestring,1);
+								cmd_mix_scene(tem_mac->valuestring,tem_port->valuestring,my_dev_state->valuestring,final_cmd);
+								resend_zt(16,final_cmd,tem_id->valuestring,tem_type->valuestring);
+								usart_send(fd,final_cmd,16);
+							}
+							break;
+						}
+						while_device_state_list_data = while_device_state_list_data->next;
+					}
+				}
+			}
+			cJSON_Delete(device_state_list_data);
+			device_state_list_data= NULL;
+		}
+	}
+	else if(strcmp(tem_type->valuestring,"040201")==0)//bfbcl
+	{
+		if(strstr(voice_str,"开一点") || strstr(voice_str,"开点"))
+		{
+			pthread_mutex_lock(&mutex_zl);
+			cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
+			pthread_mutex_unlock(&mutex_zl);
+			if(device_state_list_data != NULL)
+			{
+				if(device_state_list_data->child != NULL)
+				{
+					cJSON *my_device_state_list_data = cJSON_GetObjectItem(device_state_list_data,"data");
+					cJSON *while_device_state_list_data = my_device_state_list_data->child;
+					while(while_device_state_list_data != NULL)
+					{
+						if(strcmp(tem_id->valuestring,while_device_state_list_data->string)==0)
+						{
+							cJSON *dev_state_cjson = cJSON_GetObjectItem(my_device_state_list_data,tem_id->valuestring);
+							cJSON *my_dev_state = cJSON_GetObjectItem(dev_state_cjson,"dev_state");
+							uint8_t num_str;
+							uint8_t final_cmd[16];
+							memset(final_cmd,0,16);
+							str_to_hex(&num_str,my_dev_state->valuestring,1);
+							if(num_str>=0x5a)
+							{
+								cmd_mix(tem_mac->valuestring,tem_port->valuestring,"64",final_cmd);
+								resend_zt(16,final_cmd,tem_id->valuestring,tem_type->valuestring);
+								usart_send(fd,final_cmd,16);
+							}
+							else
+							{
+								num_str+=0x0a;
+								hex_to_str(&num_str,my_dev_state->valuestring,1);
+								cmd_mix(tem_mac->valuestring,tem_port->valuestring,my_dev_state->valuestring,final_cmd);
+								resend_zt(16,final_cmd,tem_id->valuestring,tem_type->valuestring);
+								usart_send(fd,final_cmd,16);
+							}
+							break;
+						}
+						while_device_state_list_data = while_device_state_list_data->next;
+					}
+				}
+			}
+			cJSON_Delete(device_state_list_data);
+			device_state_list_data= NULL;
+		}
+		else if(strstr(voice_str,"关一点") || strstr(voice_str,"关点"))
+		{
+			pthread_mutex_lock(&mutex_zl);
+			cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
+			pthread_mutex_unlock(&mutex_zl);
+			if(device_state_list_data != NULL)
+			{
+				if(device_state_list_data->child != NULL)
+				{
+					cJSON *my_device_state_list_data = cJSON_GetObjectItem(device_state_list_data,"data");
+					cJSON *while_device_state_list_data = my_device_state_list_data->child;
+					while(while_device_state_list_data != NULL)
+					{
+						if(strcmp(tem_id->valuestring,while_device_state_list_data->string)==0)
+						{
+							cJSON *dev_state_cjson = cJSON_GetObjectItem(my_device_state_list_data,tem_id->valuestring);
+							cJSON *my_dev_state = cJSON_GetObjectItem(dev_state_cjson,"dev_state");
+							uint8_t num_str;
+							uint8_t final_cmd[16];
+							memset(final_cmd,0,16);
+							str_to_hex(&num_str,my_dev_state->valuestring,1);
+							if(num_str<=0x0a)
+							{
+								cmd_mix_scene(tem_mac->valuestring,tem_port->valuestring,"00",final_cmd);
+								resend_zt(16,final_cmd,tem_id->valuestring,tem_type->valuestring);
+								usart_send(fd,final_cmd,16);
+							}
+							else 
+							{
+								num_str-=0x0a;
+								hex_to_str(&num_str,my_dev_state->valuestring,1);
+								cmd_mix_scene(tem_mac->valuestring,tem_port->valuestring,my_dev_state->valuestring,final_cmd);
+								resend_zt(16,final_cmd,tem_id->valuestring,tem_type->valuestring);
+								usart_send(fd,final_cmd,16);
+							}
+							break;
+						}
+						while_device_state_list_data = while_device_state_list_data->next;
+					}
+				}
+			}
+			cJSON_Delete(device_state_list_data);
+			device_state_list_data= NULL;
+		}
+	}
+}
+static void voice_judge_little(cJSON *data_arr_jx,char *Voice_CMD)
+{
+	cJSON *tem_mac = cJSON_GetObjectItem(data_arr_jx,"mac");
+	cJSON *tem_port = cJSON_GetObjectItem(data_arr_jx,"dev_port");
+	cJSON *tem_id = cJSON_GetObjectItem(data_arr_jx,"dev_id");
+	cJSON *tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
+	voice_judge_number(Voice_CMD,tem_id,tem_mac,tem_port,tem_type);
+}
 void voice_con(cJSON *root)
 {
 	cJSON *voice_data = cJSON_GetObjectItem(root,"data");
@@ -2878,7 +3092,7 @@ void voice_con(cJSON *root)
 		char voice_str_in[50];
 		memset(voice_str_in,0,50);
 		int traver_ret = traversing_room_list(voice_cmd->valuestring,voice_str_in);
-		if(strstr(voice_cmd->valuestring,"时") || strstr(voice_cmd->valuestring,"分") || strstr(voice_cmd->valuestring,"秒"))
+		if(strstr(voice_cmd->valuestring,"小时") || strstr(voice_cmd->valuestring,"分钟") || strstr(voice_cmd->valuestring,"秒"))
 		{
 			int flag_voice = 1;
 			pthread_mutex_lock(&mutex_sl);
@@ -3500,6 +3714,111 @@ void voice_con(cJSON *root)
 			cJSON_Delete(dev_list_data);
 			dev_list_data=NULL;
 		}
+		else if(strstr(voice_cmd->valuestring,"亮一点")||strstr(voice_cmd->valuestring,"暗一点")||strstr(voice_cmd->valuestring,"亮点")||strstr(voice_cmd->valuestring,"暗点"))
+		{
+			int flag_voice = 1;
+			pthread_mutex_lock(&mutex_sl);
+			cJSON *dev_list_data = cJSON_Parse(device_list);//遍历设备列表
+			pthread_mutex_unlock(&mutex_sl);
+			if(dev_list_data != NULL)
+			{
+				if(dev_list_data->child != NULL)
+				{
+					cJSON *my_dev_list_data = cJSON_GetObjectItem(dev_list_data,"data");
+					cJSON *my_dev_list_list = cJSON_GetObjectItem(my_dev_list_data,"dev_list");
+					int	data_l =  cJSON_GetArraySize(my_dev_list_list);
+					cJSON *data_arr_jx = NULL;
+					cJSON *tem_name = NULL;
+					cJSON *tem_room_id = NULL;
+					int i,j;
+					for(i=0;i<data_l;i++)
+					{
+						data_arr_jx = cJSON_GetArrayItem(my_dev_list_list,i);
+						tem_name = cJSON_GetObjectItem(data_arr_jx,"dev_name");
+						tem_room_id = cJSON_GetObjectItem(data_arr_jx,"room_id");
+						if(traver_ret)
+						{
+							if(strstr(voice_cmd->valuestring,tem_name->valuestring) && !strcmp(tem_room_id->valuestring,voice_str_in))
+							{
+								flag_voice=0;
+								run_if=4;
+								voice_judge_little(data_arr_jx,voice_cmd->valuestring);
+							}
+							else if(i==(data_l-1) && flag_voice == 1)
+							{
+								for(j=0;j<data_l;j++)
+								{
+									data_arr_jx = cJSON_GetArrayItem(my_dev_list_list,j);
+									tem_name = cJSON_GetObjectItem(data_arr_jx,"dev_name");
+									tem_room_id = cJSON_GetObjectItem(data_arr_jx,"room_id");
+									char *my_str_first = NULL;
+									char *my_str_second = NULL;
+									char *voice_str_first = NULL;
+									char *voice_str_second = NULL;
+									my_str_first = tiqu(tem_name->valuestring);
+									voice_str_first = tiqu(voice_cmd->valuestring);
+									my_str_second = str_judge(my_str_first);
+									voice_str_second = str_judge(voice_str_first);
+									if(strstr(voice_str_second,my_str_second) && !strcmp(tem_room_id->valuestring,voice_str_in))
+									{
+										run_if=4;
+										voice_judge_little(data_arr_jx,voice_cmd->valuestring);
+									}
+									free(my_str_first);
+									my_str_first=NULL;
+									free(my_str_second);
+									my_str_second=NULL;
+									free(voice_str_first);
+									voice_str_first=NULL;
+									free(voice_str_second);
+									voice_str_second=NULL;
+								}//for
+							}
+						}
+						else
+						{
+							if(strstr(voice_cmd->valuestring,tem_name->valuestring))
+							{
+								flag_voice=0;
+								run_if=4;
+								voice_judge_little(data_arr_jx,voice_cmd->valuestring);
+							}
+							else if(i==(data_l-1) && flag_voice == 1)
+							{
+								for(j=0;j<data_l;j++)
+								{
+									data_arr_jx = cJSON_GetArrayItem(my_dev_list_list,j);
+									tem_name = cJSON_GetObjectItem(data_arr_jx,"dev_name");
+									char *my_str_first = NULL;
+									char *my_str_second = NULL;
+									char *voice_str_first = NULL;
+									char *voice_str_second = NULL;
+									my_str_first = tiqu(tem_name->valuestring);
+									voice_str_first = tiqu(voice_cmd->valuestring);
+									my_str_second = str_judge(my_str_first);
+									voice_str_second = str_judge(voice_str_first);
+									if(strstr(voice_str_second,my_str_second))
+									{
+										run_if=4;
+										voice_judge_little(data_arr_jx,voice_cmd->valuestring);
+									}
+									free(my_str_first);
+									my_str_first=NULL;
+									free(my_str_second);
+									my_str_second=NULL;
+									free(voice_str_first);
+									voice_str_first=NULL;
+									free(voice_str_second);
+									voice_str_second=NULL;
+								}//for
+							}
+						}
+					}//for
+				}
+			}
+			cJSON_Delete(dev_list_data);
+			dev_list_data=NULL;
+		}
 	}
 	if(run_if==0 && NET_FLAG)
 	{
@@ -3876,7 +4195,8 @@ void update_secure(void)
 	pthread_mutex_lock(&mutex_qj);
 	if(strcmp(qj_model,"0104"))
 	{
-		char *qj_model_compare = (char *)malloc(5);
+		//char *qj_model_compare = (char *)malloc(5);
+		char qj_model_compare[5];
 		memset(qj_model_compare,0,5);
 		memcpy(qj_model_compare,qj_model,4);
 		qj_model_compare[4] = '\0';
@@ -4018,8 +4338,8 @@ void update_secure(void)
 				}
 			}
 		}
-		free(qj_model_compare);
-		qj_model_compare = NULL;
+		//free(qj_model_compare);
+		//qj_model_compare = NULL;
 		cJSON_Delete(secure_list);
 		secure_list = NULL;
 	}
@@ -4686,6 +5006,7 @@ void down_dev_state_list(char *str)
 	fsync(device_state_list_fd);
 	close(device_state_list_fd);
 	pthread_mutex_unlock(&mutex_zl);
+	device_flag = 0;
 }
 void down_bind_list(char *str)
 {
@@ -4765,8 +5086,8 @@ void get_identify(cJSON *root)
 		my_send_char=NULL;
 		create_wifi_file();
 	}
-	uint8_t voice_notice[23] = {0x5a,0xa5,0x88,0x88,0x88,0x88,0x88,0x88,0x88,0x88,0x45,0x01,0x00,0x00,0x08,0xa5,0xfa,0x00,0x03,0xbf,0x00,0x61,0xfb};//设备已上线
-	usart_send(fd,voice_notice,23);
+	//uint8_t voice_notice[23] = {0x5a,0xa5,0x88,0x88,0x88,0x88,0x88,0x88,0x88,0x88,0x45,0x01,0x00,0x00,0x08,0xa5,0xfa,0x00,0x03,0xbf,0x00,0x61,0xfb};//设备已上线
+	//usart_send(fd,voice_notice,23);
 	identify_flag=1;
 	NET_FLAG = 1;
 	file_init_net();
@@ -4783,12 +5104,13 @@ void get_identify(cJSON *root)
 		if(strcmp(dev_list_ver->valuestring,my_dev_list_ver->valuestring))
 		{
 			dev_list_rq();
-			usleep(10000);
+			usleep(100000);
 		}
 	}
 	else
 	{
 		dev_list_rq();
+		usleep(100000);
 	}
 	cJSON_Delete(dev_list_pase);
 	dev_list_pase=NULL;
@@ -4804,19 +5126,39 @@ void get_identify(cJSON *root)
 		if(strcmp(scene_list_ver->valuestring,scene_ver->valuestring))
 		{
 			scene_list_rq();
-			usleep(10000);
-			scene_detail_rq();
-			usleep(10000);
+			usleep(100000);
 		}
 	}
 	else
 	{
 		scene_list_rq();
-		usleep(10000);
-		scene_detail_rq();
+		usleep(100000);
 	}
 	cJSON_Delete(scene_list_pase);
 	scene_list_pase=NULL;
+	/////////////////////////////////////////////////////////////////////////////////////
+	pthread_mutex_lock(&mutex_scene);
+	cJSON *scene_detail_pase=cJSON_Parse(scene_detail);
+	pthread_mutex_unlock(&mutex_scene);
+	if(scene_detail_pase->child != NULL)
+	{
+		cJSON *scene_detail_pase_data = cJSON_GetObjectItem(scene_detail_pase,"data");
+		cJSON *scene_detail_ver = cJSON_GetObjectItem(scene_detail_pase_data,"scene_ver");
+		if(strcmp(scene_detail_ver->valuestring,scene_ver->valuestring))
+		{
+			printf("scene detail req!!!\n");
+			scene_detail_rq();
+			usleep(100000);
+		}
+	}
+	else
+	{
+		printf("scene detail req!!!\n");
+		scene_detail_rq();
+		usleep(100000);
+	}
+	cJSON_Delete(scene_detail_pase);
+	scene_detail_pase=NULL;
 	/////////////////////////////////////////////////////////////////////////////////////
 	cJSON *timer_ver=cJSON_GetObjectItem(gw_identify_data,"timer_ver");
 	pthread_mutex_lock(&mutex_time);
@@ -4829,11 +5171,14 @@ void get_identify(cJSON *root)
 		if(strcmp(timer_list_ver->valuestring,timer_ver->valuestring))
 		{
 			timer_list_rq();
-			usleep(10000);
+			usleep(100000);
 		}
 	}
 	else
+	{
 		timer_list_rq();
+		usleep(100000);
+	}
 	cJSON_Delete(timer_list_pase);
 	timer_list_pase=NULL;
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -4848,11 +5193,14 @@ void get_identify(cJSON *root)
 		if(strcmp(multi_bind_ver->valuestring,bind_ver->valuestring))
 		{
 			multi_bind_rq();
-			usleep(10000);
+			usleep(100000);
 		}
 	}
 	else
+	{
 		multi_bind_rq();
+		usleep(100000);
+	}
 	cJSON_Delete(multi_bind_pase);
 	multi_bind_pase=NULL;
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -4867,11 +5215,14 @@ void get_identify(cJSON *root)
 		if(strcmp(secure_set_list_ver->valuestring,model_set_ver->valuestring))
 		{
 			secure_set_list_rq();
-			usleep(10000);
+			usleep(100000);
 		}
 	}
 	else
+	{
 		secure_set_list_rq();
+		usleep(100000);
+	}
 	cJSON_Delete(secure_set_list_pase);
 	secure_set_list_pase=NULL;
 	//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4886,11 +5237,14 @@ void get_identify(cJSON *root)
 		if(strcmp(voice_set_list_ver->valuestring,voice_list_ver->valuestring))
 		{
 			voice_list_rq();
-			usleep(10000);
+			usleep(100000);
 		}
 	}
 	else
+	{
 		voice_list_rq();
+		usleep(100000);
+	}
 	cJSON_Delete(voice_list_pase);
 	voice_list_pase=NULL;
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4905,11 +5259,14 @@ void get_identify(cJSON *root)
 		if(strcmp(room_version->valuestring,room_list_ver->valuestring))
 		{
 			room_list_rq();
-			usleep(1000);
+			usleep(100000);
 		}
 	}
 	else
+	{
 		room_list_rq();
+		usleep(100000);
+	}
 	cJSON_Delete(room_list_pase);
 	room_list_pase=NULL;
 	/////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -4994,6 +5351,8 @@ void get_signal(void)
 					flag_get=1;
 				else if(strcmp(tem_type->valuestring,"010601")==0)
 					flag_get=1;
+				else if(strcmp(tem_type->valuestring,"020101")==0)
+					flag_get=1;
 				else if(strcmp(tem_type->valuestring,"040101")==0)
 					flag_get=1;
 				else if(strcmp(tem_type->valuestring,"040102")==0)
@@ -5001,6 +5360,8 @@ void get_signal(void)
 				else if(strcmp(tem_type->valuestring,"040201")==0)
 					flag_get=1;
 				else if(strcmp(tem_type->valuestring,"040301")==0)
+					flag_get=1;
+				else if(strcmp(tem_type->valuestring,"060207")==0)
 					flag_get=1;
 				else if(strcmp(tem_type->valuestring,"080301")==0)
 					flag_get=1;
@@ -5239,13 +5600,13 @@ void voice_com_con_u(int i,uint8_t *u_data,char *u_data_str)
 																		}
 																	}
 																}
-																cJSON_Delete(device_state_list_data);
-																device_state_list_data=NULL;
 																if(final_cmd[0] != final_cmd[1])
 																{
 																	resend_zt(19,final_cmd,tem_id->valuestring,tem_type->valuestring);
 																	usart_send(fd,final_cmd,19);
 																}
+																cJSON_Delete(device_state_list_data);
+																device_state_list_data=NULL;
 															}
 															else if(!strcmp(tem_type->valuestring,"010201")||!strcmp(tem_type->valuestring,"040101")||!strcmp(tem_type->valuestring,"040102"))//电池阀||普通窗帘||推窗器
 															{
@@ -5348,13 +5709,13 @@ void voice_com_con_u(int i,uint8_t *u_data,char *u_data_str)
 																		}
 																	}
 																}
-																cJSON_Delete(device_state_list_data);
-																device_state_list_data=NULL;
 																if(final_cmd[0] != final_cmd[1])
 																{
 																	resend_zt(25,final_cmd,tem_id->valuestring,tem_type->valuestring);
 																	usart_send(fd,final_cmd,25);
 																}
+																cJSON_Delete(device_state_list_data);
+																device_state_list_data=NULL;
 															}
 															else if(!strcmp(tem_type->valuestring,"080301"))////温控器
 															{
@@ -5425,13 +5786,13 @@ void voice_com_con_u(int i,uint8_t *u_data,char *u_data_str)
 																		}
 																	}
 																}
-																cJSON_Delete(device_state_list_data);
-																device_state_list_data=NULL;
 																if(final_cmd[0] != final_cmd[1])
 																{
 																	resend_zt(20,final_cmd,tem_id->valuestring,tem_type->valuestring);
 																	usart_send(fd,final_cmd,20);
 																}
+																cJSON_Delete(device_state_list_data);
+																device_state_list_data=NULL;
 															}
 															else if(!strcmp(tem_type->valuestring,"050101"))//kt
 															{
@@ -5628,11 +5989,11 @@ void voice_com_con_u(int i,uint8_t *u_data,char *u_data_str)
 																									}
 																								}
 																							}
-																							cJSON_Delete(device_state_list_data);
-																							device_state_list_data=NULL;
 																							usart_send(fd,final_cmd,str_len/2);
 																							free(final_cmd);
 																							final_cmd = NULL;
+																							cJSON_Delete(device_state_list_data);
+																							device_state_list_data=NULL;
 																							usleep(200000);
 																							break;
 																						}
@@ -5907,25 +6268,28 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 	memset(data_str,0,data_len+1);
 	memcpy(data_str,u_data_str+30,data_len);
 	data_str[data_len]='\0';
-	char *mac_str = NULL;
-	mac_str = (char*)malloc(17);//mac地址
+	//char *mac_str = NULL;
+	//mac_str = (char*)malloc(17);//mac地址
+	char mac_str[17];
 	memset(mac_str,0,17);
 	memcpy(mac_str,u_data_str+4,16);
 	mac_str[16]='\0';
-	char *port_str = NULL;
-	port_str = (char*)malloc(3);//端口号
+	//char *port_str = NULL;
+	//port_str = (char*)malloc(3);//端口号
+	char port_str[3];
 	memset(port_str,0,3);
 	memcpy(port_str,u_data_str+22,2);
 	port_str[2] = '\0';
 	if(go_net_flag==1)
 	{
-		uint8_t *req_des_cmd = NULL;
-		req_des_cmd = (uint8_t *)malloc(16);
+		//uint8_t *req_des_cmd = NULL;
+		//req_des_cmd = (uint8_t *)malloc(16);
+		uint8_t req_des_cmd[16];
 		memset(req_des_cmd,0,16);
 		cmd_request_describ_mix(mac_str,"00",req_des_cmd);
 		usart_send(fd,req_des_cmd,16);
-		free(req_des_cmd);
-		req_des_cmd=NULL;
+		//free(req_des_cmd);
+		//req_des_cmd=NULL;
 	}
 	pthread_mutex_lock(&mutex_sl);
 	cJSON *dev_list_data = cJSON_Parse(device_list);//遍历设备列表
@@ -6065,6 +6429,7 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 						memcpy(my_send_char,send_char,my_len);
 						strcat(my_send_char,"\n\0");
 						send(cd,my_send_char,my_len+1,0);
+						//printf("send : (%d)%s",send_ret,my_send_char);
 						free(send_char);
 						send_char=NULL;
 						free(my_send_char);
@@ -6072,6 +6437,10 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 						cJSON_Delete(root_u);
 						root_u = NULL;
 					}
+					#if 1
+					if(!strcmp(tem_type->valuestring,"060207"))
+					break;
+					#endif
 					if(u_data[12] != 0x45)
 						run_scene_u_triger(tem_id->valuestring,data_str);
 					if(u_data[10]==0x46 || u_data[12] == 0x47)
@@ -6155,8 +6524,9 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 																		kg=1;
 																	if(kg==1)//类似开关类
 																	{
-																		uint8_t *multi_bind_final_cmd = NULL;
-																		multi_bind_final_cmd = (uint8_t *)malloc(16);
+																		//uint8_t *multi_bind_final_cmd = NULL;
+																		//multi_bind_final_cmd = (uint8_t *)malloc(16);
+																		uint8_t multi_bind_final_cmd[16];
 																		memset(multi_bind_final_cmd,0,16);
 																		if(flag_kg==1)
 																		cmd_mix(tem_mac_for->valuestring,tem_port_for->valuestring,"01",multi_bind_final_cmd);
@@ -6164,13 +6534,14 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 																		cmd_mix(tem_mac_for->valuestring,tem_port_for->valuestring,"00",multi_bind_final_cmd);
 																		resend_zt(16,multi_bind_final_cmd,tem_id_for->valuestring,tem_type_for->valuestring);	
 																		usart_send(fd,multi_bind_final_cmd,16);
-																		free(multi_bind_final_cmd);
-																		multi_bind_final_cmd=NULL;
+																		//free(multi_bind_final_cmd);
+																		//multi_bind_final_cmd=NULL;
 																	}
 																	else if(strcmp(tem_type_for->valuestring,"010201")==0)//tgd
 																	{
-																		uint8_t *multi_bind_final_cmd = NULL;
-																		multi_bind_final_cmd = (uint8_t *)malloc(16);
+																		//uint8_t *multi_bind_final_cmd = NULL;
+																		//multi_bind_final_cmd = (uint8_t *)malloc(16);
+																		uint8_t multi_bind_final_cmd[16];
 																		memset(multi_bind_final_cmd,0,16);
 																		if(flag_kg==1)//触发源开
 																		cmd_mix(tem_mac_for->valuestring,tem_port_for->valuestring,"ff",multi_bind_final_cmd);
@@ -6178,13 +6549,14 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 																		cmd_mix(tem_mac_for->valuestring,tem_port_for->valuestring,"00",multi_bind_final_cmd);
 																		resend_zt(16,multi_bind_final_cmd,tem_id_for->valuestring,tem_type_for->valuestring);
 																		usart_send(fd,multi_bind_final_cmd,16);
-																		free(multi_bind_final_cmd);
-																		multi_bind_final_cmd=NULL;
+																		//free(multi_bind_final_cmd);
+																		//multi_bind_final_cmd=NULL;
 																	}
 																	else if(strcmp(tem_type_for->valuestring,"010301")==0)//rgb
 																	{
-																		uint8_t *multi_bind_final_cmd = NULL;
-																		multi_bind_final_cmd = (uint8_t *)malloc(19);
+																		//uint8_t *multi_bind_final_cmd = NULL;
+																		//multi_bind_final_cmd = (uint8_t *)malloc(19);
+																		uint8_t multi_bind_final_cmd[19];
 																		memset(multi_bind_final_cmd,0,19);
 																		pthread_mutex_lock(&mutex_zl);
 																		cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
@@ -6238,20 +6610,21 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 																				}
 																			}
 																		}
-																		cJSON_Delete(device_state_list_data);
-																		device_state_list_data=NULL;
 																		if(multi_bind_final_cmd[0] != multi_bind_final_cmd[1])
 																		{
 																			resend_zt(19,multi_bind_final_cmd,tem_id_for->valuestring,tem_type_for->valuestring);
 																			usart_send(fd,multi_bind_final_cmd,19);
 																		}
-																		free(multi_bind_final_cmd);
-																		multi_bind_final_cmd = NULL;
+																		cJSON_Delete(device_state_list_data);
+																		device_state_list_data=NULL;
+																		//free(multi_bind_final_cmd);
+																		//multi_bind_final_cmd = NULL;
 																	}
 																	else if(strcmp(tem_type_for->valuestring,"040201")==0)//bfbcl
 																	{
-																		uint8_t *multi_bind_final_cmd = NULL;
-																		multi_bind_final_cmd = (uint8_t *)malloc(16);
+																		//uint8_t *multi_bind_final_cmd = NULL;
+																		//multi_bind_final_cmd = (uint8_t *)malloc(16);
+																		uint8_t multi_bind_final_cmd[16];
 																		memset(multi_bind_final_cmd,0,16);
 																		if(flag_kg==1)//触发源开
 																		cmd_mix(tem_mac_for->valuestring,tem_port_for->valuestring,"64",multi_bind_final_cmd);
@@ -6259,13 +6632,14 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 																		cmd_mix(tem_mac_for->valuestring,tem_port_for->valuestring,"00",multi_bind_final_cmd);
 																		resend_zt(16,multi_bind_final_cmd,tem_id_for->valuestring,tem_type_for->valuestring);
 																		usart_send(fd,multi_bind_final_cmd,16);
-																		free(multi_bind_final_cmd);
-																		multi_bind_final_cmd = NULL;
+																		//free(multi_bind_final_cmd);
+																		//multi_bind_final_cmd = NULL;
 																	}
 																	else if(strcmp(tem_type_for->valuestring,"040301")==0)//bycl
 																	{
-																		uint8_t *multi_bind_final_cmd = NULL;
-																		multi_bind_final_cmd = (uint8_t *)malloc(17);
+																		//uint8_t *multi_bind_final_cmd = NULL;
+																		//multi_bind_final_cmd = (uint8_t *)malloc(17);
+																		uint8_t multi_bind_final_cmd[17];
 																		memset(multi_bind_final_cmd,0,17);
 																		if(flag_kg==1)//触发源开
 																		cmd_mix(tem_mac_for->valuestring,tem_port_for->valuestring,"6464",multi_bind_final_cmd);
@@ -6273,8 +6647,8 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 																		cmd_mix(tem_mac_for->valuestring,tem_port_for->valuestring,"0000",multi_bind_final_cmd);
 																		resend_zt(17,multi_bind_final_cmd,tem_id_for->valuestring,tem_type_for->valuestring);
 																		usart_send(fd,multi_bind_final_cmd,17);
-																		free(multi_bind_final_cmd);
-																		multi_bind_final_cmd = NULL;
+																		//free(multi_bind_final_cmd);
+																		//multi_bind_final_cmd = NULL;
 																	}
 																	usleep(200000);
 																	break;
@@ -6384,24 +6758,26 @@ void dev_com_con_u(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 	dev_list_data=NULL;
 	free(data_str);
 	data_str=NULL;
-	free (mac_str);
-	mac_str=NULL;
-	free(port_str);
-	port_str= NULL;
+	//free (mac_str);
+	//mac_str=NULL;
+	//free(port_str);
+	//port_str= NULL;
 }
 void dev_com_kt_con(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 {
-	char *data_str = NULL;
-	data_str= (char*)malloc(15);//指令cmd
+	//char *data_str = NULL;
+	//data_str= (char*)malloc(15);//指令cmd
+	char data_str[15];
 	memset(data_str,0,15);
 	memcpy(data_str,u_data_str+34,14);
 	data_str[14]='\0';
-	char *mac_id = NULL;
-	mac_id = (char *)malloc(9);
+	//char *mac_id = NULL;
+	//mac_id = (char *)malloc(9);
+	char mac_id[9];
 	memset(mac_id,0,9);
 	int id_num = 0;
 	for(i=0;i<4;i++)
-	id_num += u_data[31-4+i]<<(3-i)*8;
+	id_num += u_data[24+u_data[24]+i]<<(3-i)*8;
 	int_to_str(id_num,mac_id); 
 	pthread_mutex_lock(&mutex_sl);
 	cJSON *dev_list_data = cJSON_Parse(device_list);//遍历设备列表
@@ -6522,10 +6898,10 @@ void dev_com_kt_con(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 	}
 	cJSON_Delete(dev_list_data);
 	dev_list_data = NULL;
-	free(data_str);
-	data_str = NULL;
-	free(mac_id);
-	mac_id=NULL;
+	//free(data_str);
+	//data_str = NULL;
+	//free(mac_id);
+	//mac_id=NULL;
 }
 void dev_lock_con(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 {
@@ -6534,13 +6910,15 @@ void dev_lock_con(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 	memset(data_str,0,data_len+1);
 	memcpy(data_str,u_data_str+34,data_len);
 	data_str[data_len]='\0';
-	char *mac_str = NULL;
-	mac_str = (char*)malloc(17);//mac地址
+	//char *mac_str = NULL;
+	//mac_str = (char*)malloc(17);//mac地址
+	char mac_str[17];
 	memset(mac_str,0,17);
 	memcpy(mac_str,u_data_str+4,16);
 	mac_str[16]='\0';
-	char *port_str = NULL;
-	port_str = (char*)malloc(3);//端口号
+	//char *port_str = NULL;
+	//port_str = (char*)malloc(3);//端口号
+	char port_str[3];
 	memset(port_str,0,3);
 	memcpy(port_str,u_data_str+22,2);
 	port_str[2] = '\0';
@@ -6669,10 +7047,10 @@ void dev_lock_con(int i,int u_data_len,uint8_t *u_data,char *u_data_str)
 	}
 	free(data_str);
 	data_str = NULL;
-	free(mac_str);
-	mac_str = NULL;
-	free(port_str);
-	port_str = NULL;
+	//free(mac_str);
+	//mac_str = NULL;
+	//free(port_str);
+	//port_str = NULL;
 	cJSON_Delete(dev_list_data);
 	dev_list_data = NULL;
 }
@@ -6785,8 +7163,9 @@ void dev_online(int i,int u_data_len,char *u_data_str)
 	memset(data_str,0,data_len+1);
 	memcpy(data_str,u_data_str+30,data_len);
 	data_str[data_len]='\0';
-	char *mac_str = NULL;
-	mac_str = (char*)malloc(17);//mac地址
+	//char *mac_str = NULL;
+	//mac_str = (char*)malloc(17);//mac地址
+	char mac_str[17];
 	memset(mac_str,0,17);
 	memcpy(mac_str,u_data_str+4,16);
 	mac_str[16]='\0';
@@ -6807,24 +7186,26 @@ void dev_online(int i,int u_data_len,char *u_data_str)
 				net_now_time = time(NULL);
 				if((unsigned int)difftime(net_now_time,net_record_time) >= 300 || go_net_flag==0)//超时
 				{
-					uint8_t *dev_net_delete = NULL;
-					dev_net_delete = (uint8_t *)malloc(16);
+					//uint8_t *dev_net_delete = NULL;
+					//dev_net_delete = (uint8_t *)malloc(16);
+					uint8_t dev_net_delete[16];
 					memset(dev_net_delete,0,16);
 					cmd_delete_mix(mac_str,"00",dev_net_delete);
 					usart_send(fd,dev_net_delete,16);
-					free(dev_net_delete);
-					dev_net_delete=NULL;
+					//free(dev_net_delete);
+					//dev_net_delete=NULL;
 				}
 				else
 				{
-					uint8_t *req_des_cmd = NULL;
-					req_des_cmd = (uint8_t *)malloc(16);
+					//uint8_t *req_des_cmd = NULL;
+					//req_des_cmd = (uint8_t *)malloc(16);
+					uint8_t req_des_cmd[16];
 					memset(req_des_cmd,0,16);
 					cmd_request_describ_mix(mac_str,"00",req_des_cmd);
 					usleep(500000);//需要老何优化
 					usart_send(fd,req_des_cmd,16);
-					free(req_des_cmd);
-					req_des_cmd=NULL;
+					//free(req_des_cmd);
+					//req_des_cmd=NULL;
 				}
 			}
 			for(i=0;i<data_l;i++)
@@ -6845,24 +7226,26 @@ void dev_online(int i,int u_data_len,char *u_data_str)
 						net_now_time = time(NULL);
 						if((unsigned int)difftime(net_now_time,net_record_time) >= 300 || go_net_flag==0)//超时
 						{
-							uint8_t *dev_net_delete = NULL;
-							dev_net_delete = (uint8_t *)malloc(16);
+							//uint8_t *dev_net_delete = NULL;
+							//dev_net_delete = (uint8_t *)malloc(16);
+							uint8_t dev_net_delete[16];
 							memset(dev_net_delete,0,16);
 							cmd_delete_mix(mac_str,"00",dev_net_delete);
 							usart_send(fd,dev_net_delete,16);
-							free(dev_net_delete);
-							dev_net_delete=NULL;
+							//free(dev_net_delete);
+							//dev_net_delete=NULL;
 						}
 						else
 						{
-							uint8_t *req_des_cmd = NULL;
-							req_des_cmd = (uint8_t *)malloc(16);
+							//uint8_t *req_des_cmd = NULL;
+							//req_des_cmd = (uint8_t *)malloc(16);
+							uint8_t req_des_cmd[16];
 							memset(req_des_cmd,0,16);
 							cmd_request_describ_mix(mac_str,"00",req_des_cmd);
 							usleep(500000);//需要老何优化
 							usart_send(fd,req_des_cmd,16);
-							free(req_des_cmd);
-							req_des_cmd=NULL;
+							//free(req_des_cmd);
+							//req_des_cmd=NULL;
 						}
 					}
 				}
@@ -6871,8 +7254,8 @@ void dev_online(int i,int u_data_len,char *u_data_str)
 	}
 	free(data_str);
 	data_str =NULL;
-	free(mac_str);
-	mac_str = NULL;
+	//free(mac_str);
+	//mac_str = NULL;
 	cJSON_Delete(dev_list_data);
 	dev_list_data = NULL;
 }
@@ -6884,13 +7267,15 @@ void dev_status_u(uint8_t *u_data,int i,int u_data_len,char *u_data_str)
 	memset(data_str,0,data_len+1);
 	memcpy(data_str,u_data_str+30,data_len);
 	data_str[data_len]='\0';
-	char *mac_str = NULL;
-	mac_str = (char*)malloc(17);//mac地址
+	//char *mac_str = NULL;
+	//mac_str = (char*)malloc(17);//mac地址
+	char mac_str[17];
 	memset(mac_str,0,17);
 	memcpy(mac_str,u_data_str+4,16);
 	mac_str[16]='\0';
-	char *port_str = NULL;
-	port_str = (char*)malloc(3);//端口号
+	//char *port_str = NULL;
+	//port_str = (char*)malloc(3);//端口号
+	char port_str[3];
 	memset(port_str,0,3);
 	memcpy(port_str,u_data_str+22,2);
 	port_str[2] = '\0';
@@ -7078,10 +7463,10 @@ void dev_status_u(uint8_t *u_data,int i,int u_data_len,char *u_data_str)
 	}
 	free(data_str);
 	data_str =NULL;
-	free(mac_str);
-	mac_str = NULL;
-	free(port_str);
-	port_str = NULL;
+	//free(mac_str);
+	//mac_str = NULL;
+	//free(port_str);
+	//port_str = NULL;
 	cJSON_Delete(dev_list_data);
 	dev_list_data = NULL;
 }
@@ -7093,8 +7478,9 @@ void dev_descrip_u(int i,int u_data_len,char *u_data_str)
 	memset(data_str,0,data_len+1);
 	memcpy(data_str,u_data_str+30,data_len);
 	data_str[data_len]='\0';
-	char *mac_str = NULL;
-	mac_str = (char*)malloc(17);//mac地址
+	//char *mac_str = NULL;
+	//mac_str = (char*)malloc(17);//mac地址
+	char mac_str[17];
 	memset(mac_str,0,17);
 	memcpy(mac_str,u_data_str+4,16);
 	mac_str[16]='\0';
@@ -7112,6 +7498,7 @@ void dev_descrip_u(int i,int u_data_len,char *u_data_str)
 	memcpy(my_send_char,des_root_char,my_len);
 	strcat(my_send_char,"\n\0");
 	send(cd,my_send_char,my_len+1,0);
+	//printf("添加设备 : %s",my_send_char);
 	cJSON_Delete(des_root);
 	des_root=NULL;
 	free(des_root_char);
@@ -7120,8 +7507,8 @@ void dev_descrip_u(int i,int u_data_len,char *u_data_str)
 	my_send_char=NULL;
 	free(data_str);
 	data_str=NULL;
-	free(mac_str);
-	mac_str=NULL;
+	//free(mac_str);
+	//mac_str=NULL;
 }
 
 void power_65(uint8_t *u_data,int i,int u_data_len,char *u_data_str)
@@ -7132,13 +7519,15 @@ void power_65(uint8_t *u_data,int i,int u_data_len,char *u_data_str)
 	memset(data_str,0,data_len+1);
 	memcpy(data_str,u_data_str+30,data_len);
 	data_str[data_len]='\0';
-	char *mac_str = NULL;
-	mac_str = (char*)malloc(17);//mac地址
+	//char *mac_str = NULL;
+	//mac_str = (char*)malloc(17);//mac地址
+	char mac_str[17];
 	memset(mac_str,0,17);
 	memcpy(mac_str,u_data_str+4,16);
 	mac_str[16]='\0';
-	char *port_str = NULL;
-	port_str = (char*)malloc(3);//端口号
+	//char *port_str = NULL;
+	//port_str = (char*)malloc(3);//端口号
+	char port_str[3];
 	memset(port_str,0,3);
 	memcpy(port_str,u_data_str+22,2);
 	port_str[2] = '\0';
@@ -7168,7 +7557,8 @@ void power_65(uint8_t *u_data,int i,int u_data_len,char *u_data_str)
 				{
 					tem_id = cJSON_GetObjectItem(data_arr_jx,"dev_id");
 					tem_type = cJSON_GetObjectItem(data_arr_jx,"dev_type");
-					char *power_l = (char *)malloc(2);
+					//char *power_l = (char *)malloc(2);
+					char power_l[2];
 					memset(power_l,0,2);
 					get_sensor_power(u_data,power_l);
 					if(power_l[0]=='1' && NET_FLAG)
@@ -7376,8 +7766,8 @@ void power_65(uint8_t *u_data,int i,int u_data_len,char *u_data_str)
 					pthread_mutex_unlock(&mutex_zl);
 					cJSON_Delete(device_state_list_data);
 					device_state_list_data=NULL;
-					free(power_l);
-					power_l=NULL;
+					//free(power_l);
+					//power_l=NULL;
 				 }
 			}
 		}
@@ -7386,10 +7776,10 @@ void power_65(uint8_t *u_data,int i,int u_data_len,char *u_data_str)
 	dev_list_data=NULL;
 	free(data_str);
 	data_str=NULL;
-	free(mac_str);
-	mac_str=NULL;
-	free(port_str);
-	port_str=NULL;
+	//free(mac_str);
+	//mac_str=NULL;
+	//free(port_str);
+	//port_str=NULL;
 }
 
 void dev_sensor_81(int i,int u_data_len,char *u_data_str)//安防设备报警接口函数
@@ -7400,25 +7790,28 @@ void dev_sensor_81(int i,int u_data_len,char *u_data_str)//安防设备报警接
 	memset(data_str,0,data_len+1);
 	memcpy(data_str,u_data_str+30,data_len);
 	data_str[data_len]='\0';
-	char *mac_str = NULL;
-	mac_str = (char*)malloc(17);//mac地址
+	//char *mac_str = NULL;
+	//mac_str = (char*)malloc(17);//mac地址
+	char mac_str[17];
 	memset(mac_str,0,17);
 	memcpy(mac_str,u_data_str+4,16);
 	mac_str[16]='\0';
-	char *port_str = NULL;
-	port_str = (char*)malloc(3);//端口号
+	//char *port_str = NULL;
+	//port_str = (char*)malloc(3);//端口号
+	char port_str[3];
 	memset(port_str,0,3);
 	memcpy(port_str,u_data_str+22,2);
 	port_str[2] = '\0';
 	if(go_net_flag==1)
 	{
-		uint8_t *req_des_cmd = NULL;
-		req_des_cmd = (uint8_t *)malloc(16);
+		//uint8_t *req_des_cmd = NULL;
+		//req_des_cmd = (uint8_t *)malloc(16);
+		uint8_t req_des_cmd[16];
 		memset(req_des_cmd,0,16);
 		cmd_request_describ_mix(mac_str,"00",req_des_cmd);
 		usart_send(fd,req_des_cmd,16);
-		free(req_des_cmd);
-		req_des_cmd=NULL;
+		//free(req_des_cmd);
+		//req_des_cmd=NULL;
 	}
 	pthread_mutex_lock(&mutex_sl);
 	cJSON *dev_list_data = cJSON_Parse(device_list);//遍历设备列表
@@ -7717,12 +8110,12 @@ void dev_sensor_81(int i,int u_data_len,char *u_data_str)//安防设备报警接
 	}
 	cJSON_Delete(dev_list_data);
 	dev_list_data=NULL;
-	free(mac_str);
-	mac_str=NULL;
+	//free(mac_str);
+	//mac_str=NULL;
 	free(data_str);
 	data_str=NULL;
-	free(port_str);
-	port_str=NULL;
+	//free(port_str);
+	//port_str=NULL;
 }
 void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbee主动上报传感器类状态
 {
@@ -7732,25 +8125,28 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 	memset(data_str,0,data_len+1);
 	memcpy(data_str,u_data_str+30,data_len);
 	data_str[data_len]='\0';
-	char *mac_str = NULL;
-	mac_str = (char*)malloc(17);//mac地址
+	//char *mac_str = NULL;
+	//mac_str = (char*)malloc(17);//mac地址
+	char mac_str[17];
 	memset(mac_str,0,17);
 	memcpy(mac_str,u_data_str+4,16);
 	mac_str[16]='\0';
-	char *port_str = NULL;
-	port_str = (char*)malloc(3);//端口号
+	//char *port_str = NULL;
+	//port_str = (char*)malloc(3);//端口号
+	char port_str[3];
 	memset(port_str,0,3);
 	memcpy(port_str,u_data_str+22,2);
 	port_str[2] = '\0';
 	if(go_net_flag==1)
 	{
-		uint8_t *req_des_cmd = NULL;
-		req_des_cmd = (uint8_t *)malloc(16);
+		//uint8_t *req_des_cmd = NULL;
+		//req_des_cmd = (uint8_t *)malloc(16);
+		uint8_t req_des_cmd[16];
 		memset(req_des_cmd,0,16);
 		cmd_request_describ_mix(mac_str,"00",req_des_cmd);
 		usart_send(fd,req_des_cmd,16);
-		free(req_des_cmd);
-		req_des_cmd=NULL;
+		//free(req_des_cmd);
+		//req_des_cmd=NULL;
 	}
 	pthread_mutex_lock(&mutex_sl);
 	cJSON *dev_list_data = cJSON_Parse(device_list);//遍历设备列表
@@ -7790,29 +8186,33 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 					}
 					else if(strcmp(tem_type->valuestring,"060203")==0)	//temperature sensor
 					{
-						char *value = (char *)malloc(10);
+						//char *value = (char *)malloc(10);
+						char value[10];
 						memset(value,0,10);
-						char *level = (char *)malloc(2);
+						//char *level = (char *)malloc(2);
+						char level[2];
 						memset(level,0,2);
 						get_sensor_value(u_data,value,level);
 						run_scene_u_triger_sensor(tem_id->valuestring,value);
-						free(value);
-						value=NULL;
-						free(level);
-						level=NULL;
+						//free(value);
+						//value=NULL;
+						//free(level);
+						//level=NULL;
 					}
 					else if(strcmp(tem_type->valuestring,"060201")==0 || strcmp(tem_type->valuestring,"060204")==0 || strcmp(tem_type->valuestring,"060205")==0 || strcmp(tem_type->valuestring,"060206")==0)	//PM2.5 or moisture sensor or formaldehyde or TVOC
 					{
-						char *value = (char *)malloc(10);
+						//char *value = (char *)malloc(10);
+						char value[10];
 						memset(value,0,10);
-						char *level = (char *)malloc(2);
+						//char *level = (char *)malloc(2);
+						char level[2];
 						memset(level,0,2);
 						get_sensor_value(u_data,value,level);
 						run_scene_u_triger_sensor(tem_id->valuestring,level);
-						free(value);
-						value=NULL;
-						free(level);
-						level=NULL;
+						//free(value);
+						//value=NULL;
+						//free(level);
+						//level=NULL;
 					}
 					pthread_mutex_lock(&mutex_zl);
 					cJSON *device_state_list_data = cJSON_Parse(device_state_list);//遍历设备状态列表
@@ -7866,13 +8266,15 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 										root_v = NULL;
 									}
 								}
-								else if(!strcmp(tem_type->valuestring,"060201") || !strcmp(tem_type->valuestring,"060202") || !strcmp(tem_type->valuestring,"060203") || !strcmp(tem_type->valuestring,"060204") || !strcmp(tem_type->valuestring,"060205") || !strcmp(tem_type->valuestring,"060206"))
+								else if(!strcmp(tem_type->valuestring,"060201") || !strcmp(tem_type->valuestring,"060202") || !strcmp(tem_type->valuestring,"060203") || !strcmp(tem_type->valuestring,"060204") || !strcmp(tem_type->valuestring,"060205") || !strcmp(tem_type->valuestring,"060206") || !strcmp(tem_type->valuestring,"060207"))
 								{
 									cJSON *dev_status = cJSON_CreateObject();
 									cJSON_AddItemToObject(my_device_state_list_data,tem_id->valuestring,dev_status);
-									char *value = (char *)malloc(10);
+									//char *value = (char *)malloc(10);
+									char value[10];
 									memset(value,0,10);
-									char *level = (char *)malloc(2);
+									//char *level = (char *)malloc(2);
+									char level[2];
 									memset(level,0,2);
 									get_sensor_value(u_data,value,level);
 									cJSON_AddStringToObject(dev_status,"state_data",value);
@@ -7913,10 +8315,10 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 										cJSON_Delete(root_v);
 										root_v = NULL;
 									}
-									free(value);
-									value=NULL;
-									free(level);
-									level=NULL;
+									//free(value);
+									//value=NULL;
+									//free(level);
+									//level=NULL;
 								}
 							}
 							else
@@ -7981,7 +8383,7 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 												root_v = NULL;
 											}
 										}
-										else if(!strcmp(tem_type->valuestring,"060201") || !strcmp(tem_type->valuestring,"060202") || !strcmp(tem_type->valuestring,"060203") || !strcmp(tem_type->valuestring,"060204") || !strcmp(tem_type->valuestring,"060205") || !strcmp(tem_type->valuestring,"060206"))
+										else if(!strcmp(tem_type->valuestring,"060201") || !strcmp(tem_type->valuestring,"060202") || !strcmp(tem_type->valuestring,"060203") || !strcmp(tem_type->valuestring,"060204") || !strcmp(tem_type->valuestring,"060205") || !strcmp(tem_type->valuestring,"060206") || !strcmp(tem_type->valuestring,"060207"))
 										{
 											int num = cJSON_GetArraySize(dev_state_cjson);
 											cJSON *arr_for = NULL;
@@ -8001,9 +8403,11 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 												cJSON_DeleteItemFromObject(dev_state_cjson,"state_data");
 												cJSON_DeleteItemFromObject(dev_state_cjson,"state_level");
 											}
-											char *value = (char *)malloc(10);
+											//char *value = (char *)malloc(10);
+											char value[10];
 											memset(value,0,10);
-											char *level = (char *)malloc(2);
+											//char *level = (char *)malloc(2);
+											char level[2];
 											memset(level,0,2);
 											get_sensor_value(u_data,value,level);
 											cJSON_AddStringToObject(dev_state_cjson,"state_data",value);
@@ -8044,10 +8448,10 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 												cJSON_Delete(root_v);
 												root_v = NULL;
 											}
-											free(value);
-											value=NULL;
-											free(level);
-											level=NULL;
+											//free(value);
+											//value=NULL;
+											//free(level);
+											//level=NULL;
 										}
 										break;
 									}
@@ -8096,13 +8500,15 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 												root_v = NULL;
 											}
 										}
-										else if(!strcmp(tem_type->valuestring,"060201") || !strcmp(tem_type->valuestring,"060202") || !strcmp(tem_type->valuestring,"060203") || !strcmp(tem_type->valuestring,"060204") || !strcmp(tem_type->valuestring,"060205") || !strcmp(tem_type->valuestring,"060206"))
+										else if(!strcmp(tem_type->valuestring,"060201") || !strcmp(tem_type->valuestring,"060202") || !strcmp(tem_type->valuestring,"060203") || !strcmp(tem_type->valuestring,"060204") || !strcmp(tem_type->valuestring,"060205") || !strcmp(tem_type->valuestring,"060206") || !strcmp(tem_type->valuestring,"060207"))
 										{
 											cJSON *dev_status = cJSON_CreateObject();
 											cJSON_AddItemToObject(my_device_state_list_data,tem_id->valuestring,dev_status);
-											char *value = (char *)malloc(10);
+											//char *value = (char *)malloc(10);
+											char value[10];
 											memset(value,0,10);
-											char *level = (char *)malloc(2);
+											//char *level = (char *)malloc(2);
+											char level[2];
 											memset(level,0,2);
 											get_sensor_value(u_data,value,level);
 											cJSON_AddStringToObject(dev_status,"state_data",value);
@@ -8143,10 +8549,10 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 												cJSON_Delete(root_v);
 												root_v = NULL;
 											}
-											free(value);
-											value=NULL;
-											free(level);
-											level=NULL;
+											//free(value);
+											//value=NULL;
+											//free(level);
+											//level=NULL;
 										}
 									}
 								}
@@ -8163,10 +8569,10 @@ void dev_sensor_82(uint8_t *u_data,int i,int u_data_len,char *u_data_str)//zigbe
 	}
 	free(data_str);
 	data_str=NULL;
-	free(mac_str);
-	mac_str=NULL;
-	free(port_str);
-	port_str=NULL;
+	//free(mac_str);
+	//mac_str=NULL;
+	//free(port_str);
+	//port_str=NULL;
 	cJSON_Delete(dev_list_data);
 	dev_list_data=NULL;
 }
@@ -8209,13 +8615,14 @@ void up_dev_describe(cJSON *root)//删除列表更新而更新状态列表
 	if(strcmp(delete_data->child->string,"mac")==0)
 	{
 		cJSON *delete_mac = cJSON_GetObjectItem(delete_data,"mac");
-		uint8_t *dev_net_delete = NULL;
-		dev_net_delete = (uint8_t *)malloc(16);
+		//uint8_t *dev_net_delete = NULL;
+		//dev_net_delete = (uint8_t *)malloc(16);
+		uint8_t dev_net_delete[16];
 		memset(dev_net_delete,0,16);
 		cmd_delete_mix(delete_mac->valuestring,"00",dev_net_delete);
 		usart_send(fd,dev_net_delete,16);
-		free(dev_net_delete);
-		dev_net_delete=NULL;
+		//free(dev_net_delete);
+		//dev_net_delete=NULL;
 		delete_delay_or_human_file(delete_mac->valuestring);
 		cJSON *dev_list_data = NULL;
 		pthread_mutex_lock(&mutex_sl);
@@ -8446,12 +8853,13 @@ void up_dev_des(void)//随着列表更新而更新状态列表
 							}
 							else if(a==3)
 							{
-								uint8_t *final_cmd_stastus = (uint8_t *)malloc(16);
+								//uint8_t *final_cmd_stastus = (uint8_t *)malloc(16);
+								uint8_t final_cmd_stastus[16];
 								memset(final_cmd_stastus,0,16);
 								cmd_mix_get_stastus1(data_mac->valuestring,data_port->valuestring,"00",final_cmd_stastus);
 								usart_send(fd,final_cmd_stastus,16);
-								free(final_cmd_stastus);
-								final_cmd_stastus=NULL;
+								//free(final_cmd_stastus);
+								//final_cmd_stastus=NULL;
 								usleep(200000);	
 							}
 						}
@@ -8644,12 +9052,13 @@ void up_dev_des(void)//随着列表更新而更新状态列表
 									}
 									else if(a == 3)
 									{
-										uint8_t *final_cmd_stastus = (uint8_t *)malloc(16);
+										//uint8_t *final_cmd_stastus = (uint8_t *)malloc(16);
+										uint8_t final_cmd_stastus[16];
 										memset(final_cmd_stastus,0,16);
 										cmd_mix_get_stastus1(data_mac->valuestring,data_port->valuestring,"00",final_cmd_stastus);
 										usart_send(fd,final_cmd_stastus,16);
-										free(final_cmd_stastus);
-										final_cmd_stastus=NULL;
+										//free(final_cmd_stastus);
+										//final_cmd_stastus=NULL;
 										usleep(200000);	
 									}
 								}
@@ -8932,6 +9341,8 @@ void run_the_scene(char *str_id)
 													a=1;
 												else if(strcmp(type_condition->valuestring,"060206")==0)
 													a=1;
+												else if(strcmp(type_condition->valuestring,"060207")==0)
+													a=3;
 												else
 													a=2;
 												if(a==1)
@@ -10035,8 +10446,9 @@ int scene_time_judge(char *my_time,cJSON *mxid,char *strid)
 							class=8;
 							if(class==1)//bycl
 							{
-								uint8_t *final_cmd = NULL;
-								final_cmd = (uint8_t *)malloc(17);
+								//uint8_t *final_cmd = NULL;
+								//final_cmd = (uint8_t *)malloc(17);
+								uint8_t final_cmd[17];
 								memset(final_cmd,0,17);
 								if(!strcmp(cmd_zx->valuestring,"reverse"))
 								{
@@ -10163,13 +10575,14 @@ int scene_time_judge(char *my_time,cJSON *mxid,char *strid)
 									resend_zt(17,final_cmd,tem_id->valuestring,tem_type->valuestring);
 									usart_send(fd, final_cmd,17);
 								}
-								free(final_cmd);
-								final_cmd = NULL;
+								//free(final_cmd);
+								//final_cmd = NULL;
 							}
 							else if(class==2)//rgb
 							{
-								uint8_t *final_cmd = NULL;
-								final_cmd = (uint8_t *)malloc(19);
+								//uint8_t *final_cmd = NULL;
+								//final_cmd = (uint8_t *)malloc(19);
+								uint8_t final_cmd[19];
 								memset(final_cmd,0,19);
 								if(!strcmp(cmd_zx->valuestring,"reverse"))
 								{
@@ -10296,8 +10709,8 @@ int scene_time_judge(char *my_time,cJSON *mxid,char *strid)
 									resend_zt(19,final_cmd,tem_id->valuestring,tem_type->valuestring);
 									usart_send(fd, final_cmd,19);
 								}
-								free(final_cmd);
-								final_cmd = NULL;
+								//free(final_cmd);
+								//final_cmd = NULL;
 							}
 							else if(class==3)
 							{
@@ -10570,8 +10983,9 @@ int scene_time_judge(char *my_time,cJSON *mxid,char *strid)
 							}
 							else if(class==4)
 							{
-								uint8_t *final_cmd = NULL;
-								final_cmd = (uint8_t *)malloc(16);
+								//uint8_t *final_cmd = NULL;
+								//final_cmd = (uint8_t *)malloc(16);
+								uint8_t final_cmd[16];
 								memset(final_cmd,0,16);
 								if(!strcmp(cmd_zx->valuestring,"reverse"))
 								{
@@ -10777,8 +11191,8 @@ int scene_time_judge(char *my_time,cJSON *mxid,char *strid)
 									resend_zt(16,final_cmd,tem_id->valuestring,tem_type->valuestring);
 									usart_send(fd, final_cmd,16);
 								}
-								free(final_cmd);
-								final_cmd = NULL;
+								//free(final_cmd);
+								//final_cmd = NULL;
 							}
 							else if(class==5)
 							{
@@ -11020,25 +11434,27 @@ int scene_time_judge(char *my_time,cJSON *mxid,char *strid)
 							}
 							else if(class==10)
 							{
-								uint8_t *final_cmd = NULL;
-								final_cmd = (uint8_t *)malloc(25);
+								//uint8_t *final_cmd = NULL;
+								//final_cmd = (uint8_t *)malloc(25);
+								uint8_t final_cmd[25];
 								memset(final_cmd,0,25);
 								cmd_mix_scene(tem_mac->valuestring,tem_port->valuestring,cmd_zx->valuestring,final_cmd);
 								resend_zt(25,final_cmd,tem_id->valuestring,tem_type->valuestring);
 								usart_send(fd, final_cmd,25);
-								free(final_cmd);
-								final_cmd = NULL;
+								//free(final_cmd);
+								//final_cmd = NULL;
 							}
 							else if(class==8)
 							{
-								uint8_t *final_cmd = NULL;
-								final_cmd = (uint8_t *)malloc(20);
+								//uint8_t *final_cmd = NULL;
+								//final_cmd = (uint8_t *)malloc(20);
+								uint8_t final_cmd[20];
 								memset(final_cmd,0,20);
 								cmd_mix_scene(tem_mac->valuestring,tem_port->valuestring,cmd_zx->valuestring,final_cmd);
 								resend_zt(20,final_cmd,tem_id->valuestring,tem_type->valuestring);
 								usart_send(fd, final_cmd,20);
-								free(final_cmd);
-								final_cmd = NULL;
+								//free(final_cmd);
+								//final_cmd = NULL;
 							}
 							break;
 						}
@@ -11308,13 +11724,15 @@ int scene_time_judge(char *my_time,cJSON *mxid,char *strid)
 void get_signal_u(char *u_data_str)
 {
 	int i;
-	char *data_str = NULL;
-	data_str= (char*)malloc(5);//signal
+	//char *data_str = NULL;
+	//data_str= (char*)malloc(5);//signal
+	char data_str[5];
 	memset(data_str,0,5);
 	memcpy(data_str,u_data_str+30,4);
 	data_str[4]='\0';
-	char *mac_str = NULL;
-	mac_str = (char*)malloc(17);//mac地址
+	//char *mac_str = NULL;
+	//mac_str = (char*)malloc(17);//mac地址
+	char mac_str[17];
 	memset(mac_str,0,17);
 	memcpy(mac_str,u_data_str+4,16);
 	mac_str[16]='\0';
@@ -11357,10 +11775,10 @@ void get_signal_u(char *u_data_str)
 	memcpy(my_send_char,send_char,my_len);
 	strcat(my_send_char,"\n\0");
 	send(cd,my_send_char,my_len+1,0);
-	free(data_str);
-	data_str=NULL;
-	free(mac_str);
-	mac_str=NULL;
+	//free(data_str);
+	//data_str=NULL;
+	//free(mac_str);
+	//mac_str=NULL;
 	free(send_char);
 	send_char=NULL;
 	free(my_send_char);

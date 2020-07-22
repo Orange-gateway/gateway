@@ -167,9 +167,11 @@ void str_to_hex(uint8_t *str_unchar,char *str_char,int len_of_hex)
 }
 void get_sensor_value(uint8_t *u_data,char *value,char *level)
 {
-	char *value_z = (char *)malloc(6);
+	//char *value_z = (char *)malloc(6);
+	char value_z[6];
 	memset(value_z,0,6);
-	char *value_x = (char *)malloc(4);
+	//char *value_x = (char *)malloc(4);
+	char value_x[4];
 	memset(value_x,0,4);
 	uint16_t num1 ;
 	num1 = u_data[16]<<8 | u_data[17];
@@ -189,10 +191,10 @@ void get_sensor_value(uint8_t *u_data,char *value,char *level)
 	int my_level;
 	my_level = (int)u_data[19];
 	int_to_str(my_level,level);
-	free(value_z);
-	value_z = NULL;
-	free(value_x);
-	value_x = NULL;
+	//free(value_z);
+	//value_z = NULL;
+	//free(value_x);
+	//value_x = NULL;
 }
 void get_sensor_power(uint8_t *u_data,char *level)
 {
@@ -267,7 +269,7 @@ void get_mac(char *MyMac)
     close(sock);
     hex_to_str(MyMac0,MyMac,6);
     MyMac[12] = '\0';
-
+	//printf("mac:%s\n",MyMac);
 }
 
 /***************************************************************************/
@@ -901,11 +903,11 @@ void delete_delay_or_human_file(char *delete_mac)
 		if(!strcmp(p1->mac,delete_mac))
 		{
 			p1->flag = 0;
+			my_human_file();
 			break;
 		}
 		p1 = p1->next;
 	}
-	my_human_file();
 	pthread_mutex_unlock(&mutex_human);
 	
 	DELAY *p = NULL;

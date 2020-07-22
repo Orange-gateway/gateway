@@ -117,17 +117,42 @@ int server_wifi(void)
 							cJSON *wifi_uid = cJSON_GetObjectItem(wifi_root,"uid");
 							cJSON *wifi_ssid = cJSON_GetObjectItem(wifi_root,"ssid");
 							cJSON *wifi_passwd = cJSON_GetObjectItem(wifi_root,"passwd");
-
 							memset(u_id,0,50);
 							memcpy(u_id,wifi_uid->valuestring,strlen(wifi_uid->valuestring));
 							printf("uid:%s\n",wifi_uid->valuestring);
 							printf("ssid:%s\n",wifi_ssid->valuestring);
 							printf("passwd:%s\n",wifi_passwd->valuestring);
-							strcat(passwd,"/bin/set_sta.sh ");
-							strcat(passwd,wifi_ssid->valuestring);
-							strcat(passwd," ");
-							strcat(passwd,wifi_passwd->valuestring);
-							system(passwd);
+							if(strlen(wifi_passwd->valuestring) == 0)
+							{
+								system("uci set network.wan.ifname='ath0'");
+								system("uci set wireless.@wifi-iface[0].network='wan'");
+								system("uci set wireless.@wifi-iface[0].mode='sta'");
+								strcat(passwd,"uci set wireless.@wifi-iface[0].ssid='");
+								strcat(passwd,wifi_ssid->valuestring);
+								strcat(passwd,"'");
+								system(passwd);
+								system("uci set wireless.@wifi-iface[0].encryption='none'");
+								system("uci commit");
+								system("/etc/init.d/network restart");
+							}
+							else
+							{
+								system("uci set network.wan.ifname='ath0'");
+								system("uci set wireless.@wifi-iface[0].network='wan'");
+								system("uci set wireless.@wifi-iface[0].mode='sta'");
+								strcat(passwd,"uci set wireless.@wifi-iface[0].ssid='");
+								strcat(passwd,wifi_ssid->valuestring);
+								strcat(passwd,"'");
+								system(passwd);
+								memset(passwd,0,100);
+								strcat(passwd,"uci set wireless.@wifi-iface[0].key='");
+								strcat(passwd,wifi_passwd->valuestring);
+								strcat(passwd,"'");
+								system(passwd);
+								system("uci set wireless.@wifi-iface[0].encryption='psk2'");
+								system("uci commit");
+								system("/etc/init.d/network restart");
+							}
 							while(1)
 							{
 								if(system("ping -c 1 www.baidu.com") == 0)

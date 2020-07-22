@@ -1,10 +1,9 @@
 #include "include.h"
-
+#include <netinet/tcp.h>
 /*  tcp初始化函数   */
 int client_init(void)
 {
 	int ret = 1;
-	
 	cd = -1;
 	struct sockaddr_in ser_addr;
 	
@@ -19,8 +18,11 @@ int client_init(void)
 	tmp = gethostbyname("smart.zgjuzi.com");
 	
 	if(tmp == NULL)
+	{
+		printf("NULL NULL NULL\n");
 		return -1;
-		
+	}
+	
 	memcpy(&ser_addr.sin_addr,(struct in_addr *)tmp->h_addr,4);
 
 	cd = socket(AF_INET,SOCK_STREAM,0);
@@ -30,8 +32,21 @@ int client_init(void)
 	if( ret == 0)
 	{	
 		printf("connect success  cd = %d\n",cd);
-		struct timeval timeout = {1,0}; 
-		setsockopt(cd,SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout,sizeof(struct timeval));
+		struct timeval timeout;
+		socklen_t time_len = sizeof(timeout);
+		getsockopt(cd,SOL_SOCKET, SO_SNDTIMEO,&timeout,&time_len);
+		printf("%d %d\n",(int)timeout.tv_sec,(int)timeout.tv_usec);
+		#if 0
+			int keepAlive = 1;
+			int keepIdle = 10;
+			int keepInterval = 1;
+			int keepCount = 5;
+			setsockopt(cd, SOL_SOCKET,SO_KEEPALIVE, &keepAlive, sizeof(keepAlive));
+			setsockopt(cd, IPPROTO_TCP, TCP_KEEPIDLE, &keepIdle, sizeof(keepIdle));
+			setsockopt(cd, IPPROTO_TCP, TCP_KEEPINTVL, &keepInterval, sizeof(keepInterval));
+			setsockopt(cd, IPPROTO_TCP, TCP_KEEPCNT, &keepCount, sizeof(keepCount));
+		#endif
+		
 		return 0;
 	}
 	else

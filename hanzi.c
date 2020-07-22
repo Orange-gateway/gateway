@@ -1964,6 +1964,7 @@ const uint16_t GB2312_Unicode[][2] =
   {0xBDD9, 0x52AB},  /* '劫' -> 21163 */
   {0xBDDA, 0x8282},  /* '节' -> 33410 */
   {0xBDDB, 0x6854},  /* '桔' -> 26708 */
+  {0xE9D9, 0x6A58},  /* '橘' -> 27224 */
   {0xBDDC, 0x6770},  /* '杰' -> 26480 */
   {0xBDDD, 0x6377},  /* '捷' -> 25463 */
   {0xBDDE, 0x776B},  /* '睫' -> 30571 */
@@ -7475,7 +7476,8 @@ char judge(uint16_t tmp)
 	else if(tmp >=0xD1B9 && tmp <= 0xD4D0) ch='Y';                                               
 	else if(tmp >=0xD4D1 && tmp <= 0xD7F9) ch='Z';                                               
 	if(tmp == 0xB5F7) ch='T';                                                                    
-	return ch;                                                                                   
+	else if(tmp == 0xE9D9) ch = 'J';
+	return ch;                                                                           
 }                                                                                              
 char* str_judge(char *str)                                                                     
 {	                                                                                             
@@ -7488,7 +7490,7 @@ char* str_judge(char *str)
 	memset(my_str,0,len+1);                                                                      
 	while(*str != '\0')                                                                          
 	{                                                                                            
-		if(*str>=65 && *str<=90)                                                                   
+		if(*str>=48 && *str<=122)                                                                   
 		{                                                                                          
 			my_str[num] = *str;                                                                      
 			num+=1;                                                                                  
@@ -7525,11 +7527,10 @@ char* tiqu(char *str)
 	int i,num=0;                                                                                 
 	for(i=0;i<len;i++)                                                                           
 	{                                                                                            
-		if((str[i]>=0 && str[i]<=64) || (str[i]>=91 && str[i]<=96) || (str[i]>=123 && str[i]<=127))
+		if((str[i]>=0 && str[i]<=47) || (str[i]>=58 && str[i]<=64) || (str[i]>=123 && str[i]<=127))
 		continue;                                                                                  
 		else if(str[i]>=97 && str[i]<=122)                                                         
 		{                                                                                          
-			str[i]-=32;                                                                              
 			my_str[num] = str[i];                                                                    
 			num+=1;                                                                                  
 		}                                                                                          
